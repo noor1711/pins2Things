@@ -157,7 +157,7 @@ export default function PrivacyPolicyPage() {
         As stated, we do not store any Pinterest data that we access for
         generating recommendations; it is processed temporarily and discarded.
         We retain your email address for as long as necessary to provide you
-        with the App's services or as required by law.
+        with the App&apos;s services or as required by law.
       </p>
       <hr />
       <h2>6. Your Data Protection Rights</h2>
@@ -204,7 +204,7 @@ export default function PrivacyPolicyPage() {
         applicable law.
       </p>
       <hr />
-      <h2>7. Children's Privacy</h2>
+      <h2>7. Children&apos;s Privacy</h2>
       <p>
         Our App is intended for users who meet the minimum age requirements for
         using Pinterest, which typically means users must be at least 13 years
@@ -218,9 +218,9 @@ export default function PrivacyPolicyPage() {
       <p>
         We may update our Privacy Policy from time to time. We will notify you
         of any changes by posting the new Privacy Policy on this page and
-        updating the "Last Updated" date at the top. You are advised to review
-        this Privacy Policy periodically for any changes. Changes to this
-        Privacy Policy are effective when they are posted on this page.
+        updating the &quot;Last Updated&quot; date at the top. You are advised
+        to review this Privacy Policy periodically for any changes. Changes to
+        this Privacy Policy are effective when they are posted on this page.
       </p>
       <hr />
       <h2>9. Contact Us</h2>
