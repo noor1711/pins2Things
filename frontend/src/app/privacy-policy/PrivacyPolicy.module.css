@@ -1,0 +1,50 @@
+/* frontend/src/app/privacy-policy/PrivacyPolicy.module.css */
+
+.policyTitle {
+    font-size: 2.2em;
+    text-align: center;
+    color: #e60023;
+    /* Pinterest red for main title */
+    margin-bottom: 0.5em;
+}
+
+.lastUpdated {
+    text-align: center;
+    font-size: 0.9em;
+    color: #777;
+    margin-bottom: 2em;
+}
+
+.importantNotes {
+    background-color: #f0f8ff;
+    /* Light blue background */
+    border-left: 5px solid #4a90e2;
+    padding: 15px;
+    margin: 1.5em 0;
+    border-radius: 4px;
+}
+
+.importantNotes strong {
+    color: #333;
+}
+
+.noteHighlight {
+    font-style: italic;
+    color: #555;
+    background-color: #f9f9f9;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 0.5em;
+}
+
+.contactEmail {
+    font-weight: bold;
+    color: #e60023;
+    /* Pinterest red */
+    text-decoration: none;
+}
+
+.contactEmail:hover {
+    text-decoration: underline;
+}
