@@ -90,7 +90,7 @@ export default function PinterestRecommender() {
           <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
             <Heart className="w-4 h-4 text-pink-400" />
             <a
-              href="#"
+              href="/privacy-policy"
               className="text-purple-600 hover:text-pink-500 font-medium transition-colors duration-300"
             >
               Privacy Policy
