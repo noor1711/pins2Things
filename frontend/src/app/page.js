@@ -1,15 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Sparkles, Star, Palette } from "lucide-react";
 import "./globals.css"; // Import global styles
+import PinterestForm from "@/components/PinterestForm";
+import { getRecommendations } from "@/lib/utils";
 
 export default function PinterestRecommender() {
   const [url, setUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [recommendations, setRecommendations] = useState(null);
 
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const recommendations = await getRecommendations(url);
+      // Handle the recommendations (e.g., display them)
+      console.log(recommendations);
+      setRecommendations(recommendations);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-blue-100 relative overflow-hidden">
       {/* Floating decorative elements */}
@@ -52,27 +70,36 @@ export default function PinterestRecommender() {
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="relative">
-                  <Input
-                    type="url"
-                    placeholder="e.g., https://www.pinterest.com/user/board-name/ 🌸"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    className="w-full px-6 py-4 text-lg rounded-2xl border-2 border-pink-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white/90 placeholder:text-gray-400 transition-all duration-300"
-                  />
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <Heart className="w-5 h-5 text-pink-300" />
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleFormSubmit(e);
+                }}
+              >
+                <div className="space-y-6">
+                  <div className="relative">
+                    <Input
+                      type="url"
+                      placeholder="e.g., https://www.pinterest.com/user/board-name/ 🌸"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      className="w-full px-6 py-4 text-lg rounded-2xl border-2 border-pink-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white/90 placeholder:text-gray-400 transition-all duration-300"
+                    />
+                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                      <Heart className="w-5 h-5 text-pink-300" />
+                    </div>
                   </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full py-4 text-lg font-bold rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                  >
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Get Aesthetic Recommendations
+                    <Heart className="w-5 h-5 ml-2 animate-pulse" />
+                  </Button>
                 </div>
-
-                <Button className="w-full py-4 text-lg font-bold rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Get Aesthetic Recommendations
-                  <Heart className="w-5 h-5 ml-2 animate-pulse" />
-                </Button>
-              </div>
-
+              </form>
               {/* Cute decorative elements */}
               <div className="flex justify-center items-center gap-4 mt-8 text-2xl">
                 <span>🌸</span>
@@ -84,7 +111,7 @@ export default function PinterestRecommender() {
             </CardContent>
           </Card>
         </div>
-
+        <PinterestForm recommendations={recommendations} />
         {/* Footer */}
         <div className="text-center mt-12">
           <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
