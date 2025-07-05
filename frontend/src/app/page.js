@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Sparkles, Star, Palette } from "lucide-react";
 import "./globals.css"; // Import global styles
-import PinterestForm from "@/components/PinterestForm";
 import { getRecommendations } from "@/lib/utils";
+import StyledCarousel from "@/components/Carousel";
 
 export default function PinterestRecommender() {
   const [url, setUrl] = useState("");
@@ -111,7 +111,7 @@ export default function PinterestRecommender() {
             </CardContent>
           </Card>
         </div>
-        <PinterestForm recommendations={recommendations} />
+        <StyledCarousel />
         {/* Footer */}
         <div className="text-center mt-12">
           <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
