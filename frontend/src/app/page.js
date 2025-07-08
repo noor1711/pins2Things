@@ -8,16 +8,49 @@ import { Heart, Sparkles, Star, Palette } from "lucide-react";
 import "./globals.css"; // Import global styles
 import { getRecommendations } from "@/lib/utils";
 import StyledCarousel from "@/components/Carousel";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PinterestRecommender() {
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
 
+  const router = useRouter(); // Hook to programmatically navigate users
+  const searchParams = useSearchParams(); // Hook to read URL query parameters (e.g., after OAuth redirect)
+
+  // useEffect to check the authentication status based on URL parameters (after OAuth callback)
+  // and for potential future checks (e.g., local storage token)
+  useEffect(() => {
+    const status = searchParams.get("status");
+    // const message = searchParams.get("message");
+
+    if (status === "success") {
+      router.replace(window.location.pathname, undefined, { shallow: true });
+    } else if (status === "error") {
+      router.replace(window.location.pathname, undefined, { shallow: true });
+    } else {
+      // In a real-world application, you would also perform an initial check here
+      // to see if the user is *already* authenticated (e.g., by checking for a token in
+      // localStorage, a cookie, or by making an API call to your backend).
+      // For this example, we default to not authenticated unless a success param is present.
+      console.log("No authentication status found in URL parameters.");
+    }
+  }, [searchParams, router]); // Dependencies: re-run this effect if URL query params or router object change
+
+  // Function to initiate the Pinterest OAuth flow by redirecting to your backend
+  const handleConnectPinterest = () => {
+    // Redirect the user's browser to your Python backend endpoint that starts the Pinterest OAuth flow.
+    // IMPORTANT: Ensure your Python backend is running locally on port 8080 (http://localhost:8080)
+    // For deployment, this URL would be your deployed backend URL (e.g., https://your-backend.vercel.app/api/pinterest-auth-start)
+    router.push("http://localhost:8080/api/pinterest-auth-start");
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      // This is the URL of your backend endpoint that starts the OAuth flow
+      handleConnectPinterest();
       const recommendations = await getRecommendations(url);
       // Handle the recommendations (e.g., display them)
       console.log(recommendations);
