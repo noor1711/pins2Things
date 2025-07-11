@@ -1,34 +1,50 @@
 import os
+from flask.cli import load_dotenv
 import requests
 import base64
 
-from flask import Flask, redirect, request, session
+from flask import Flask, redirect, request, session, jsonify
+from flask_cors import CORS
 # from dotenv import load_dotenv
 
-# load_dotenv() # Load environment variables from .env file
+load_dotenv() # Load environment variables from .env file
 
 app = Flask(__name__)
+# Enable CORS for the API, 
+# TODO: also enable it for production 
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000", "supports_credentials": True}})
 app.secret_key = os.urandom(24) # Replace with a strong, permanent secret key for production
+ENV = os.getenv('FLASK_ENV', 'local') # Default to 'local' if not set
+if ENV == 'production':
+    # In production, you should set a strong secret key and use HTTPS
+    app.secret_key = os.getenv('SECRET_KEY') # Set this in your environment variables
+
+CERT_FILE = os.path.join(os.path.dirname(__file__), 'sshSecret/localhost+1.pem') # Or your certs subfolder
+KEY_FILE = os.path.join(os.path.dirname(__file__), 'sshSecret/localhost+1-key.pem') # Or your certs subfolder
+
+app.config.update(
+    SESSION_COOKIE_SAMESITE="None",
+    SESSION_COOKIE_SECURE=True,  # <<< Now this will work because Flask is HTTPS
+    SESSION_COOKIE_HTTPONLY=True # Good practice
+)
 
 # --- Pinterest API Configuration (Get these from your Pinterest Developer Dashboard) ---
-PINTEREST_CLIENT_ID = "application_id_here" # Replace with your actual Pinterest app client ID
-PINTEREST_CLIENT_SECRET = "pin_secret_here"
-# This must EXACTLY match one of the Redirect URIs configured in your Pinterest app settings
-# For local development: http://localhost:8080/pinterest-callback
-# For Vercel deployment: https://your-vercel-domain.vercel.app/api/pinterest-callback (or adjust your backend's domain)
-PINTEREST_REDIRECT_URI = "http://localhost:8080/api/pinterest-callback"
+PINTEREST_CLIENT_ID = os.getenv('PINTEREST_CLIENT_ID')
+PINTEREST_CLIENT_SECRET = os.getenv('PINTEREST_CLIENT_SECRET')
+PINTEREST_REDIRECT_URI = os.getenv('PINTEREST_REDIRECT_URI') # This must EXACTLY match one of the Redirect URIs configured in your Pinterest app settings
+
+# --- Backend Endpoint to Handle OAuth Callback ---
+FRONTEND_HOME_URL = os.getenv('FRONTEND_HOME_URL', 'http://localhost:3000') # Default to localhost if not set
 
 # OAuth Endpoints
-PINTEREST_AUTHORIZE_URL = "https://www.pinterest.com/oauth/"
-PINTEREST_TOKEN_URL = "https://api.pinterest.com/v5/oauth/token"
+PINTEREST_AUTHORIZE_URL = os.getenv('PINTEREST_AUTHORIZE_URL', 'https://www.pinterest.com/oauth/')
+PINTEREST_TOKEN_URL = os.getenv('PINTEREST_TOKEN_URL', 'https://api.pinterest.com/v5/oauth/token')
 
 # --- Backend Endpoint to Initiate OAuth ---
 @app.route('/api/pinterest-auth-start')
 def pinterest_auth_start():
     print("Starting Pinterest OAuth flow...")
-    # Define the scopes (permissions) your app needs.
     # For reading pins and boards: 'boards:read', 'pins:read', 'user_accounts:read'
-    # Check Pinterest API docs for all available scopes.
     SCOPES = "boards:read,pins:read,user_accounts:read" # Comma-separated
     
     auth_url = (
@@ -39,9 +55,6 @@ def pinterest_auth_start():
         f"scope={SCOPES}"
     )
     return redirect(auth_url)
-
-# --- Backend Endpoint to Handle OAuth Callback ---
-FRONTEND_HOME_URL = "http://localhost:3000" # For local development
 
 @app.route('/api/pinterest-callback')
 def pinterest_callback():
@@ -101,6 +114,76 @@ def pinterest_callback():
         error_message = f"Network_Error: {str(e)}"
         return redirect(f"{FRONTEND_HOME_URL}/?status=error&message={error_message}")
 
+# Endpoint for frontend to fetch recommendations (after the redirect)
+# This assumes you stored the access_token in the session for the user
+@app.route('/api/get-recommendations', methods=['GET'])
+def get_recommendations():
+    access_token = session.get('pinterest_access_token')
+    if not access_token:
+        return jsonify({"error": "Not authenticated with Pinterest"}), 401
+
+    try:
+        # Example: Fetching user's top pins (Pinterest API might vary)
+        # You'll need to consult Pinterest API docs for specific "recommendation" endpoints.
+        # For this example, let's fetch some dummy data or user's boards again.
+        
+        board_url = request.args.get('board_url')
+        print(f"Received board_url from frontend: {board_url}") # For debugging
+        if not board_url:
+            return jsonify({"error": "Missing 'board_url' parameter"}), 400
+        
+        # Example: Get current user's boards again
+        boards_url = "https://api.pinterest.com/v5/boards/";
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            'Content-Type': 'application/json'
+        }
+        boards_response = requests.get(boards_url, headers=headers)
+        boards_response.raise_for_status()
+        boards_data = boards_response.json().get('items', []) # Assuming 'items' contains boards
+
+        
+        # You would process 'boards_data' or other API results into your recommendations
+        recommendations = [
+            {"id": board.get('id'), "name": board.get('name'), "description": board.get('description')}
+            for board in boards_data
+        ]   
+        print(boards_data) # For debugging
+        userEnteredBoardName = board_url.split('/')[-2].lower() if board_url else None
+        print(f"User entered board name: {userEnteredBoardName}") # For debugging
+        currentBoardId = None
+        for board in boards_data:
+            if board.get('name').lower() == userEnteredBoardName:
+                currentBoardId = board.get('id')
+                break   
+        if not currentBoardId:
+            return jsonify({"error": "Board not found"}), 404   
+        # Now fetch pins from the specific board
+        pins_url = f"https://api.pinterest.com/v5/boards/{currentBoardId}/pins/"
+        pins_response = requests.get(pins_url, headers=headers)
+        pins_response.raise_for_status()
+        pins_data = pins_response.json().get('items', []) # Assuming 'items' contains pins      
+        print(f"Fetched {len(pins_data)} pins from board {currentBoardId}") # For debugging
+        print(pins_data) # For debugging
+        pins = [
+            {
+                "id": pin.get('id'),
+                "link": pin.get('link'),
+                "image_url": pin.get('media', {}).get('images', {}).get('600x', {}).get('url', ''),
+                "description": pin.get('description')
+            }
+            for pin in pins_data
+        ]
+        return jsonify({"status": "success", "pins": pins})
+
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error fetching recommendations: {e}")
+        print(f"Response: {e.response.text}")
+        return jsonify({"error": "Failed to fetch recommendations from Pinterest", "details": e.response.text}), 500
+    except Exception as e:
+        print(f"An unexpected error occurred while fetching recommendations: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+    
 # --- You can remove or modify the default '/' route if you want Flask to only handle API ---
 # @app.route('/')
 # def home():
@@ -111,4 +194,8 @@ def get_current_user_pinterest_token():
 
 # Run the Flask app
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080) 
+    if ENV == "local":
+        # For local development, run with HTTPS using self-signed certs
+        app.run(debug=True, host='0.0.0.0', ssl_context=(CERT_FILE, KEY_FILE), port=8080)
+    else:
+        app.run(debug=True, host='0.0.0.0', port=8080)

@@ -11,9 +11,12 @@ import StyledCarousel from "@/components/Carousel";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PinterestRecommender() {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(
+    "https://in.pinterest.com/noornimrat2000/cowgirl/"
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
+  const [status, setStatus] = useState(null); // State to hold authentication status
 
   const router = useRouter(); // Hook to programmatically navigate users
   const searchParams = useSearchParams(); // Hook to read URL query parameters (e.g., after OAuth redirect)
@@ -35,6 +38,8 @@ export default function PinterestRecommender() {
       // For this example, we default to not authenticated unless a success param is present.
       console.log("No authentication status found in URL parameters.");
     }
+    console.log("Authentication status from URL:", status);
+    setStatus(status); // Update the status state based on URL parameters
   }, [searchParams, router]); // Dependencies: re-run this effect if URL query params or router object change
 
   // Function to initiate the Pinterest OAuth flow by redirecting to your backend
@@ -42,23 +47,37 @@ export default function PinterestRecommender() {
     // Redirect the user's browser to your Python backend endpoint that starts the Pinterest OAuth flow.
     // IMPORTANT: Ensure your Python backend is running locally on port 8080 (http://localhost:8080)
     // For deployment, this URL would be your deployed backend URL (e.g., https://your-backend.vercel.app/api/pinterest-auth-start)
-    router.push("http://localhost:8080/api/pinterest-auth-start");
+    router.push("https://localhost:8080/api/pinterest-auth-start");
   };
+
+  useEffect(() => {
+    if (status === "success") {
+      // User is authenticated, you can now fetch recommendations
+      const fetchRecommendations = async () => {
+        try {
+          setIsLoading(true);
+          const recommendations = await getRecommendations(
+            "https://in.pinterest.com/noornimrat2000/cowgirl/"
+          ); // Replace with actual board URL
+          setRecommendations(recommendations);
+          console.log("Fetched recommendations:", recommendations);
+        } catch (error) {
+          console.error("Error fetching recommendations:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchRecommendations();
+    }
+  }, [status]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     try {
       // This is the URL of your backend endpoint that starts the OAuth flow
       handleConnectPinterest();
-      const recommendations = await getRecommendations(url);
-      // Handle the recommendations (e.g., display them)
-      console.log(recommendations);
-      setRecommendations(recommendations);
     } catch (error) {
-      console.error("Error fetching recommendations:", error);
-    } finally {
-      setIsLoading(false);
+      console.error("Error doing Oauth connection", error);
     }
   };
   return (

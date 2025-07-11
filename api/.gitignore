@@ -1,1 +1,8 @@
 venv/
+.env
+sshSecret/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db    
