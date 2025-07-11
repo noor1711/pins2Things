@@ -2,3 +2,5 @@ Flask
 google-generativeai
 requests
 Pillow
+flask_cors
+python-dotenv
