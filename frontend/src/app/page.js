@@ -47,7 +47,7 @@ export default function PinterestRecommender() {
     // Redirect the user's browser to your Python backend endpoint that starts the Pinterest OAuth flow.
     // IMPORTANT: Ensure your Python backend is running locally on port 8080 (http://localhost:8080)
     // For deployment, this URL would be your deployed backend URL (e.g., https://your-backend.vercel.app/api/pinterest-auth-start)
-    router.push("https://localhost:8080/api/pinterest-auth-start");
+    router.push(process.env.NEXT_PUBLIC_BACKEND_URL);
   };
 
   useEffect(() => {
