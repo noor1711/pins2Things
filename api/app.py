@@ -6,6 +6,7 @@ import base64
 from flask import Flask, redirect, request, session, jsonify
 from flask_cors import CORS
 # from dotenv import load_dotenv
+from recommend import getRecommendations  # Import the function from recommend.py
 
 load_dotenv() # Load environment variables from .env file
 
@@ -165,16 +166,11 @@ def get_recommendations():
         pins_data = pins_response.json().get('items', []) # Assuming 'items' contains pins      
         print(f"Fetched {len(pins_data)} pins from board {currentBoardId}") # For debugging
         print(pins_data) # For debugging
-        pins = [
-            {
-                "id": pin.get('id'),
-                "link": pin.get('link'),
-                "image_url": pin.get('media', {}).get('images', {}).get('600x', {}).get('url', ''),
-                "description": pin.get('description')
-            }
-            for pin in pins_data
-        ]
-        return jsonify({"status": "success", "pins": pins})
+        pin_urls = [pin.get('media', {}).get('images', {}).get('600x', {}).get('url', '') for pin in pins_data if pin.get('media')]
+        print(f"Extracted {len(pin_urls)} pin image URLs") # For debugging
+        # get recommendations based on pin URLs
+        recommendations = getRecommendations(pin_urls)
+        return jsonify(recommendations), 200
 
     except requests.exceptions.HTTPError as e:
         print(f"HTTP Error fetching recommendations: {e}")

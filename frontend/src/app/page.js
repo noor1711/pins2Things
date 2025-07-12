@@ -29,8 +29,10 @@ export default function PinterestRecommender() {
 
     if (status === "success") {
       router.replace(window.location.pathname, undefined, { shallow: true });
+      setStatus(status);
     } else if (status === "error") {
       router.replace(window.location.pathname, undefined, { shallow: true });
+      setStatus(status);
     } else {
       // In a real-world application, you would also perform an initial check here
       // to see if the user is *already* authenticated (e.g., by checking for a token in
@@ -39,7 +41,6 @@ export default function PinterestRecommender() {
       console.log("No authentication status found in URL parameters.");
     }
     console.log("Authentication status from URL:", status);
-    setStatus(status); // Update the status state based on URL parameters
   }, [searchParams, router]); // Dependencies: re-run this effect if URL query params or router object change
 
   // Function to initiate the Pinterest OAuth flow by redirecting to your backend

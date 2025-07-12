@@ -21,19 +21,7 @@ GOOGLE_CSE_ID = os.environ.get("GOOGLE_CSE_ID")
 GOOGLE_CSE_API_KEY = os.environ.get("GOOGLE_CSE_API_KEY")
 
 genai.configure(api_key=GOOGLE_GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel('gemini-pro-vision')
-
-# --- Helper Functions (Copy these from the previous detailed main.py) ---
-def fetch_pinterest_pins(board_url, num_pins=5):
-    # This is the placeholder/dummy implementation for MVP.
-    # Replace with actual Pinterest API calls for production.
-    logging.info(f"Attempting to fetch pins from: {board_url}")
-    dummy_urls = [
-        "https://i.pinimg.com/564x/23/e8/67/23e867d60e7e17c09e3a6c117d91d1c3.jpg",
-        "https://i.pinimg.com/564x/0f/c6/8e/0fc68e1e7e40c8f5d070b4a4c5f9b4c0.jpg",
-        "https://i.pinimg.com/564x/8a/1b/09/8a1b09b0a1d0f81d1e4c7e6c4f0b2f5c.jpg"
-    ]
-    return dummy_urls[:num_pins]
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 
 def get_image_from_url(url):
     try:
@@ -88,7 +76,6 @@ def perform_google_cse_search(query):
         "cx": GOOGLE_CSE_ID,
         "q": query,
         "num": 3,
-        "searchType": "image" # or "product"
     }
     try:
         response = requests.get(search_url, params=params)
@@ -96,6 +83,7 @@ def perform_google_cse_search(query):
         data = response.json()
         results = []
         for item in data.get("items", []):
+            print(f"Found item:", item.keys())  # Debugging line to see available keys
             results.append({
                 "title": item.get("title"),
                 "link": item.get("link"),
@@ -106,24 +94,7 @@ def perform_google_cse_search(query):
         logging.error(f"Error performing Google CSE search for '{query}': {e}")
         return []
 
-# --- Main Flask Endpoint ---
-@app.route('/recommend', methods=['POST', 'OPTIONS'])
-def recommend_endpoint():
-    if request.method == 'OPTIONS':
-        response = jsonify({})
-        response.headers.add('Access-Control-Allow-Origin', '*') # IMPORTANT for frontend
-        response.headers.add('Access-Control-Allow-Methods', 'POST')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        return response
-
-    # Handle the POST request
-    request_json = request.get_json(silent=True)
-    board_url = request_json.get('board_url') if request_json else None
-
-    if not board_url:
-        return jsonify({"error": "Missing 'board_url' in request."}), 400
-
-    pin_image_urls = fetch_pinterest_pins(board_url)
+def getRecommendations(pin_image_urls):
     if not pin_image_urls:
         return jsonify({"error": "Could not fetch images. Check board or API."}), 500
 
@@ -155,9 +126,7 @@ def recommend_endpoint():
         "recommendations": recommendations
     }
 
-    response = jsonify(response_data)
-    response.headers.add('Access-Control-Allow-Origin', '*') # Set your Vercel domain here in production
-    return response
+    return response_data
 
 # Vercel will look for an 'app' variable, which is our Flask app
 # For local testing with `vercel dev` or `flask run`, you might add:
