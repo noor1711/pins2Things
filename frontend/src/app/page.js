@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,15 @@ import { Heart, Sparkles, Star, Palette } from "lucide-react";
 import "./globals.css"; // Import global styles
 import { getRecommendations } from "@/lib/utils";
 import StyledCarousel from "@/components/Carousel";
-import { useRouter, useSearchParams } from "next/navigation";
+
+const recommendationToCardItemMapper = (recommendations) => {
+  return recommendations?.recommendations?.map((item, index) => ({
+    id: index,
+    title: item.title,
+    image: item.thumbnail || "/placeholder.svg?height=200&width=200", // Fallback image
+    link: item.link || "#", // Fallback link
+  }));
+};
 
 export default function PinterestRecommender() {
   const [url, setUrl] = useState(
@@ -16,32 +24,6 @@ export default function PinterestRecommender() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
-  const [status, setStatus] = useState(null); // State to hold authentication status
-
-  const router = useRouter(); // Hook to programmatically navigate users
-  const searchParams = useSearchParams(); // Hook to read URL query parameters (e.g., after OAuth redirect)
-
-  // useEffect to check the authentication status based on URL parameters (after OAuth callback)
-  // and for potential future checks (e.g., local storage token)
-  useEffect(() => {
-    const status = searchParams.get("status");
-    // const message = searchParams.get("message");
-
-    if (status === "success") {
-      router.replace(window.location.pathname, undefined, { shallow: true });
-      setStatus(status);
-    } else if (status === "error") {
-      router.replace(window.location.pathname, undefined, { shallow: true });
-      setStatus(status);
-    } else {
-      // In a real-world application, you would also perform an initial check here
-      // to see if the user is *already* authenticated (e.g., by checking for a token in
-      // localStorage, a cookie, or by making an API call to your backend).
-      // For this example, we default to not authenticated unless a success param is present.
-      console.log("No authentication status found in URL parameters.");
-    }
-    console.log("Authentication status from URL:", status);
-  }, [searchParams, router]); // Dependencies: re-run this effect if URL query params or router object change
 
   const fetchRecommendations = async () => {
     try {
@@ -49,7 +31,7 @@ export default function PinterestRecommender() {
       const recommendations = await getRecommendations(
         "https://in.pinterest.com/noornimrat2000/cowgirl/"
       ); // Replace with actual board URL
-      setRecommendations(recommendations);
+      setRecommendations(recommendationToCardItemMapper(recommendations));
       console.log("Fetched recommendations:", recommendations);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
@@ -150,7 +132,7 @@ export default function PinterestRecommender() {
             </CardContent>
           </Card>
         </div>
-        <StyledCarousel />
+        <StyledCarousel items={recommendations} />
         {/* Footer */}
         <div className="text-center mt-12">
           <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">

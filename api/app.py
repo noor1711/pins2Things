@@ -106,12 +106,14 @@ def perform_google_cse_search(query):
         response.raise_for_status()
         data = response.json()
         results = []
+        print(f"Google CSE search results for '{query}':", data)  # Debugging line to see the raw response
         for item in data.get("items", []):
             print(f"Found item:", item.keys())  # Debugging line to see available keys
             results.append({
                 "title": item.get("title"),
                 "link": item.get("link"),
-                "thumbnail": item.get("image", {}).get("thumbnailLink")
+                "thumbnail": item.get("pagemap", {}).get("cse_image", [{}])[0].get("src", "") or item.get("displayLink", ""),
+                "snippet": item.get("snippet", ""),
             })
         return results
     except Exception as e:
