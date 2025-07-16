@@ -222,7 +222,6 @@ def user_status():
     # The get_valid_pinterest_token() function (from our previous discussion)
     # already handles checking if the access token is expired and refreshing it.
     token = get_valid_pinterest_token()
-    print("session obje", session)
     if token:
         # If a valid token is returned, the user is authenticated.
         # You could also add user-specific data from your session here if needed.
