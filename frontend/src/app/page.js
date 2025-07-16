@@ -43,40 +43,26 @@ export default function PinterestRecommender() {
     console.log("Authentication status from URL:", status);
   }, [searchParams, router]); // Dependencies: re-run this effect if URL query params or router object change
 
-  // Function to initiate the Pinterest OAuth flow by redirecting to your backend
-  const handleConnectPinterest = () => {
-    // Redirect the user's browser to your Python backend endpoint that starts the Pinterest OAuth flow.
-    // IMPORTANT: Ensure your Python backend is running locally on port 8080 (http://localhost:8080)
-    // For deployment, this URL would be your deployed backend URL (e.g., https://your-backend.vercel.app/api/pinterest-auth-start)
-    router.push(process.env.NEXT_PUBLIC_BACKEND_URL);
-  };
-
-  useEffect(() => {
-    if (status === "success") {
-      // User is authenticated, you can now fetch recommendations
-      const fetchRecommendations = async () => {
-        try {
-          setIsLoading(true);
-          const recommendations = await getRecommendations(
-            "https://in.pinterest.com/noornimrat2000/cowgirl/"
-          ); // Replace with actual board URL
-          setRecommendations(recommendations);
-          console.log("Fetched recommendations:", recommendations);
-        } catch (error) {
-          console.error("Error fetching recommendations:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchRecommendations();
+  const fetchRecommendations = async () => {
+    try {
+      setIsLoading(true);
+      const recommendations = await getRecommendations(
+        "https://in.pinterest.com/noornimrat2000/cowgirl/"
+      ); // Replace with actual board URL
+      setRecommendations(recommendations);
+      console.log("Fetched recommendations:", recommendations);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [status]);
+  };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
       // This is the URL of your backend endpoint that starts the OAuth flow
-      handleConnectPinterest();
+      fetchRecommendations(); // Simulate successful connection for demo purposes
     } catch (error) {
       console.error("Error doing Oauth connection", error);
     }

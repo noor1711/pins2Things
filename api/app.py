@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from flask.cli import load_dotenv
 import requests
@@ -158,6 +159,79 @@ FRONTEND_HOME_URL = os.getenv('FRONTEND_HOME_URL', 'http://localhost:3000') # De
 PINTEREST_AUTHORIZE_URL = os.getenv('PINTEREST_AUTHORIZE_URL', 'https://www.pinterest.com/oauth/')
 PINTEREST_TOKEN_URL = os.getenv('PINTEREST_TOKEN_URL', 'https://api.pinterest.com/v5/oauth/token')
 
+def get_valid_pinterest_token():
+    
+    access_token = session.get('pinterest_access_token')
+    return access_token
+    # refresh_token = session.get('pinterest_refresh_token')
+    # access_token_expiry_str = session.get('pinterest_access_token_expiry')
+
+
+    # if not access_token and not refresh_token and not access_token_expiry_str:
+    #     print("No Pinterest tokens found in session.")
+    #     return None # User needs to re-authenticate
+
+    # access_token_expiry = access_token_expiry_str and datetime.fromisoformat(access_token_expiry_str) or datetime.datetime.now() - datetime.timedelta(seconds=1)
+
+    # # Check if access token is expired or will expire soon (e.g., within 5 minutes)
+    # if access_token_expiry < (datetime.datetime.now() + datetime.timedelta(minutes=5)):
+    #     print("Access token expired or close to expiring. Attempting refresh...")
+    #     refresh_payload = {
+    #         "grant_type": "refresh_token",
+    #         "refresh_token": refresh_token,
+    #         "client_id": PINTEREST_CLIENT_ID,
+    #         "client_secret": PINTEREST_CLIENT_SECRET
+    #     }
+    #     headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    #     try:
+    #         refresh_response = requests.post(PINTEREST_TOKEN_URL, data=refresh_payload, headers=headers)
+    #         refresh_response.raise_for_status()
+    #         refresh_data = refresh_response.json()
+
+    #         new_access_token = refresh_data['access_token']
+    #         # Pinterest might send a new refresh token with a refresh, always use the latest
+    #         new_refresh_token = refresh_data.get('refresh_token', refresh_token)
+    #         new_expires_in = refresh_data['expires_in']
+    #         new_access_token_expiry = datetime.now() + datetime.timedelta(seconds=new_expires_in)
+
+    #         # --- Update stored tokens (CRITICAL!) ---
+    #         session['pinterest_access_token'] = new_access_token
+    #         session['pinterest_refresh_token'] = new_refresh_token
+    #         session['pinterest_access_token_expiry'] = new_access_token_expiry.isoformat()
+    #         print("Pinterest token refreshed successfully.")
+    #         return new_access_token
+
+    #     except requests.exceptions.RequestException as e:
+    #         print(f"Error refreshing Pinterest token: {e}")
+    #         # Refresh failed, tokens are likely invalid. Clear them and force re-auth.
+    #         session.pop('pinterest_access_token', None)
+    #         session.pop('pinterest_refresh_token', None)
+    #         session.pop('pinterest_access_token_expiry', None)
+    #         session.pop('pinterest_authenticated', None)
+    #         return None
+    # else:
+    #     # Access token is still valid
+    #     return access_token
+
+@app.route('/api/auth/status', methods=['GET'])
+def user_status():
+    """
+    Checks if the current user's session holds valid Pinterest authentication tokens.
+    """
+    # The get_valid_pinterest_token() function (from our previous discussion)
+    # already handles checking if the access token is expired and refreshing it.
+    token = get_valid_pinterest_token()
+    print("session obje", session)
+    if token:
+        # If a valid token is returned, the user is authenticated.
+        # You could also add user-specific data from your session here if needed.
+        return jsonify({"isAuthenticated": True, "message": "Authenticated with Pinterest"})
+    else:
+        # No valid token found or refresh failed, user is not authenticated.
+        # Ensure that get_valid_pinterest_token() clears tokens from session if refresh fails.
+        return jsonify({"isAuthenticated": False, "message": "Not authenticated with Pinterest"})
+
 # --- Backend Endpoint to Initiate OAuth ---
 @app.route('/api/pinterest-auth-start')
 def pinterest_auth_start():
@@ -236,10 +310,14 @@ def pinterest_callback():
 # This assumes you stored the access_token in the session for the user
 @app.route('/api/get-recommendations', methods=['GET'])
 def get_recommendations():
-    access_token = session.get('pinterest_access_token')
+    access_token = get_valid_pinterest_token()
     if not access_token:
-        return jsonify({"error": "Not authenticated with Pinterest"}), 401
-
+        return redirect("pinterest-auth-start") # Redirect to start OAuth flow if no valid token
+    
+    access_token = get_valid_pinterest_token()
+    if not access_token:   
+        return jsonify({"error": "User not authenticated with Pinterest"}), 401
+    
     try:
         # Example: Fetching user's top pins (Pinterest API might vary)
         # You'll need to consult Pinterest API docs for specific "recommendation" endpoints.
