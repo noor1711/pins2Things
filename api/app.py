@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from flask.cli import load_dotenv
 import requests
@@ -106,9 +106,7 @@ def perform_google_cse_search(query):
         response.raise_for_status()
         data = response.json()
         results = []
-        print(f"Google CSE search results for '{query}':", data)  # Debugging line to see the raw response
         for item in data.get("items", []):
-            print(f"Found item:", item.keys())  # Debugging line to see available keys
             results.append({
                 "title": item.get("title"),
                 "link": item.get("link"),
@@ -139,7 +137,7 @@ def getRecommendations(pin_image_urls):
     final_keywords = list(all_keywords)
     final_search_query = " ".join(sorted(list(set(overall_search_query_parts))))
     if not final_search_query and final_keywords:
-         final_search_query = " ".join(final_keywords) + " products"
+         final_search_query = " ".join(final_keywords) + " buy" if len(final_keywords) > 0 else ""
 
     if final_search_query:
         cse_results = perform_google_cse_search(final_search_query)
@@ -164,57 +162,51 @@ PINTEREST_TOKEN_URL = os.getenv('PINTEREST_TOKEN_URL', 'https://api.pinterest.co
 def get_valid_pinterest_token():
     
     access_token = session.get('pinterest_access_token')
-    return access_token
-    # refresh_token = session.get('pinterest_refresh_token')
-    # access_token_expiry_str = session.get('pinterest_access_token_expiry')
+    refresh_token = session.get('pinterest_refresh_token')
+    access_token_expiry_str = session.get('pinterest_access_token_expiry')
+    # refresh_token_expiry_str = session.get('pinterest_refresh_token_expiry')
 
+    if not access_token or not refresh_token or not access_token_expiry_str:
+        print("No Pinterest tokens found in session.")
+        return None # User needs to re-authenticate
 
-    # if not access_token and not refresh_token and not access_token_expiry_str:
-    #     print("No Pinterest tokens found in session.")
-    #     return None # User needs to re-authenticate
+    access_token_expiry = access_token_expiry_str and datetime.fromisoformat(access_token_expiry_str) or datetime.now() - timedelta(seconds=1)
 
-    # access_token_expiry = access_token_expiry_str and datetime.fromisoformat(access_token_expiry_str) or datetime.datetime.now() - datetime.timedelta(seconds=1)
+    # Check if access token is expired or will expire soon (e.g., within 5 minutes)
+    if access_token_expiry < (datetime.now() + timedelta(minutes=5)):
+        print("Access token expired or close to expiring. Attempting refresh...")
+        refresh_payload = {
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+            "client_id": PINTEREST_CLIENT_ID,
+            "client_secret": PINTEREST_CLIENT_SECRET
+        }
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
-    # # Check if access token is expired or will expire soon (e.g., within 5 minutes)
-    # if access_token_expiry < (datetime.datetime.now() + datetime.timedelta(minutes=5)):
-    #     print("Access token expired or close to expiring. Attempting refresh...")
-    #     refresh_payload = {
-    #         "grant_type": "refresh_token",
-    #         "refresh_token": refresh_token,
-    #         "client_id": PINTEREST_CLIENT_ID,
-    #         "client_secret": PINTEREST_CLIENT_SECRET
-    #     }
-    #     headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        try:
+            refresh_response = requests.post(PINTEREST_TOKEN_URL, data=refresh_payload, headers=headers)
+            refresh_response.raise_for_status()
+            refresh_data = refresh_response.json()
 
-    #     try:
-    #         refresh_response = requests.post(PINTEREST_TOKEN_URL, data=refresh_payload, headers=headers)
-    #         refresh_response.raise_for_status()
-    #         refresh_data = refresh_response.json()
+            new_access_token = refresh_data['access_token']
+            session['pinterest_access_token'] = new_access_token
+            session['pinterest_refresh_token'] = refresh_data.get('refresh_token') # Store refresh token if available
+            session['pinterest_access_token_expiry'] = (datetime.now() + timedelta(seconds=refresh_data.get('expires_in', 3600))).isoformat() # Store expiry time
+            session['pinterest_refresh_token_expiry'] = (datetime.now() + timedelta(seconds=refresh_data.get('refresh_token_expires_in', 3600))).isoformat() # Store refresh token expiry time
+            print("Pinterest token refreshed successfully.")
+            return new_access_token
 
-    #         new_access_token = refresh_data['access_token']
-    #         # Pinterest might send a new refresh token with a refresh, always use the latest
-    #         new_refresh_token = refresh_data.get('refresh_token', refresh_token)
-    #         new_expires_in = refresh_data['expires_in']
-    #         new_access_token_expiry = datetime.now() + datetime.timedelta(seconds=new_expires_in)
-
-    #         # --- Update stored tokens (CRITICAL!) ---
-    #         session['pinterest_access_token'] = new_access_token
-    #         session['pinterest_refresh_token'] = new_refresh_token
-    #         session['pinterest_access_token_expiry'] = new_access_token_expiry.isoformat()
-    #         print("Pinterest token refreshed successfully.")
-    #         return new_access_token
-
-    #     except requests.exceptions.RequestException as e:
-    #         print(f"Error refreshing Pinterest token: {e}")
-    #         # Refresh failed, tokens are likely invalid. Clear them and force re-auth.
-    #         session.pop('pinterest_access_token', None)
-    #         session.pop('pinterest_refresh_token', None)
-    #         session.pop('pinterest_access_token_expiry', None)
-    #         session.pop('pinterest_authenticated', None)
-    #         return None
-    # else:
-    #     # Access token is still valid
-    #     return access_token
+        except requests.exceptions.RequestException as e:
+            print(f"Error refreshing Pinterest token: {e}")
+            # Refresh failed, tokens are likely invalid. Clear them and force re-auth.
+            session.pop('pinterest_access_token', None)
+            session.pop('pinterest_refresh_token', None)
+            session.pop('pinterest_access_token_expiry', None)
+            session.pop('pinterest_authenticated', None)
+            return None
+    else:
+        # Access token is still valid
+        return access_token
 
 @app.route('/api/auth/status', methods=['GET'])
 def user_status():
@@ -294,8 +286,9 @@ def pinterest_callback():
         # Using Flask's `session` is for DEMO PURPOSES ONLY and won't persist across restarts
         # or be shared between multiple client requests reliably in a serverless environment.
         session['pinterest_access_token'] = access_token
-        # print(f"Successfully exchanged code for access token: {access_token}")
-        # Redirect back to the frontend's home page with a success status
+        session['pinterest_refresh_token'] = token_data.get('refresh_token') # Store refresh token if available
+        session['pinterest_access_token_expiry'] = (datetime.now() + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat() # Store expiry time
+        session['pinterest_refresh_token_expiry'] = (datetime.now() + timedelta(seconds=token_data.get('refresh_token_expires_in', 3600))).isoformat() # Store refresh token expiry time
         return redirect(f"{FRONTEND_HOME_URL}/?status=success")
 
     except requests.exceptions.HTTPError as e:

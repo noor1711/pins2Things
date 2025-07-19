@@ -1,60 +1,31 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
-  CarouselItem,
+  CarouselItem as CarouselComponent,
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import { Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
 
-const dummyProducts = [
-  {
-    id: 1,
-    title: "Kawaii Cat Plushie",
-    image: "/placeholder.svg?height=200&width=200",
-    price: "$24.99",
-    link: "/products/cat-plushie",
-  },
-  {
-    id: 2,
-    title: "Rainbow Unicorn Mug",
-    image: "/placeholder.svg?height=200&width=200",
-    price: "$18.50",
-    link: "/products/unicorn-mug",
-  },
-  {
-    id: 3,
-    title: "Pastel Bear Keychain",
-    image: "/placeholder.svg?height=200&width=200",
-    price: "$12.99",
-    link: "/products/bear-keychain",
-  },
-  {
-    id: 4,
-    title: "Cute Panda Notebook",
-    image: "/placeholder.svg?height=200&width=200",
-    price: "$15.75",
-    link: "/products/panda-notebook",
-  },
-  {
-    id: 5,
-    title: "Bunny Ear Headband",
-    image: "/placeholder.svg?height=200&width=200",
-    price: "$22.00",
-    link: "/products/bunny-headband",
-  },
-];
-
-const StyledCarousel = ({ items = dummyProducts }) => {
+const StyledCarousel = ({ items }) => {
   return items?.length > 0 ? (
-    <div className="w-full max-w-5xl mx-auto p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-pink-600 mb-2">
-          {"✨ Product Recommendations ✨"}
-        </h2>
-        <p className="text-gray-600">Discover our adorable products!</p>
+    <div className="w-full max-w-6xl mx-auto p-6">
+      <div className="text-center mb-12">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <Sparkles className="w-6 h-6 text-purple-600" />
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+            Product Recommendations
+          </h2>
+          <Zap className="w-6 h-6 text-pink-600" />
+        </div>
+        <p className="text-gray-600 text-lg">
+          Discover products that match your aesthetic perfectly
+        </p>
       </div>
 
       <Carousel
@@ -62,69 +33,53 @@ const StyledCarousel = ({ items = dummyProducts }) => {
           align: "start",
           loop: true,
         }}
-        className="w-full p-2"
+        className="w-full"
       >
-        <CarouselContent>
+        <CarouselContent className="-ml-2 md:-ml-4">
           {items?.map((item) => (
-            <CarouselItem
+            <CarouselComponent
               key={item.id}
               className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3"
             >
-              <Card className="border-gray-200 rounded-lg">
-                <CardContent className="p-0">
-                  <div className="relative">
-                    <img
-                      src={item?.image || "/placeholder.svg"}
-                      alt={item?.title}
-                      width={200}
-                      height={200}
-                      className="w-full h-48 object-cover"
-                      loading="lazy"
-                    />
-                    {/* <Button
-                      size="sm"
-                      variant="ghost"
-                      className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/80 hover:bg-white shadow-md"
-                    >
-                      <Heart className="h-4 w-4 text-pink-500" />
-                    </Button> */}
-                    {/* <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-white/90 rounded-full px-2 py-1">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      <span className="text-xs font-medium">4.9</span>
-                    </div> */}
-                  </div>
+              <div className="h-full">
+                <Card className="border border-gray-200 bg-white hover:border-purple-300 transition-all duration-300 group h-full py-0">
+                  <CardContent className="p-0 h-full flex flex-col">
+                    <div className="relative overflow-hidden rounded-t-lg">
+                      <img
+                        src={
+                          item?.image || "/placeholder.svg?height=240&width=320"
+                        }
+                        alt={item?.title}
+                        className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                        style={{ aspectRatio: "4/3" }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
 
-                  <div className="p-4 space-y-3">
-                    <h3 className="font-semibold text-gray-800 text-lg leading-tight">
-                      {item?.title}
-                    </h3>
+                    <div className="p-6 space-y-4 flex-1 flex flex-col justify-between min-h-[140px]">
+                      <h3 className="font-bold text-xl text-gray-800 leading-tight group-hover:text-purple-700 transition-colors duration-200 flex-1">
+                        {item?.title}
+                      </h3>
 
-                    <Link href={item?.link} className="block">
-                      <Button className="w-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white rounded-full py-2 font-medium shadow-md hover:shadow-lg transition-all duration-200">
-                        {"Buy Now ♡"}
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
+                      <Link href={item?.link} className="block">
+                        <Button className="w-full py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-purple-700 border-2 border-purple-200 hover:border-purple-300 transform hover:scale-[1.02] transition-all duration-200">
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Shop Now
+                          <Zap className="w-4 h-4 ml-2" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CarouselComponent>
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="bg-white/90 hover:bg-white border-pink-200 text-pink-600 shadow-lg rounded-full h-12 w-12" />
-        <CarouselNext className="bg-white/90 hover:bg-white border-pink-200 text-pink-600 shadow-lg rounded-full h-12 w-12" />
+        <CarouselPrevious className="bg-white/90 hover:bg-white border-2 border-purple-200 text-purple-600 hover:shadow-xl rounded-full h-12 w-12 hover:border-purple-400 transition-all duration-200 -left-6" />
+        <CarouselNext className="bg-white/90 hover:bg-white border-2 border-purple-200 text-purple-600 hover:shadow-xl rounded-full h-12 w-12 hover:border-purple-400 transition-all duration-200 -right-6" />
       </Carousel>
-
-      {/* <div className="text-center mt-8">
-        <Link href="/products">
-          <Button
-            variant="outline"
-            className="rounded-full border-pink-300 text-pink-600 hover:bg-pink-50 px-8 bg-transparent"
-          >
-            {"View All Products →"}
-          </Button>
-        </Link>
-      </div> */}
     </div>
   ) : (
     <></>
