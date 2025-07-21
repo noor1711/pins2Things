@@ -11,7 +11,7 @@ export const getRecommendations = async (input) => {
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_RECOMMENDATIONS_URL
-      }?board_url=${encodeURIComponent(input)}`,
+      }?board=${encodeURIComponent(input)}`,
       { credentials: "include" }
     );
     if (!response.ok) {

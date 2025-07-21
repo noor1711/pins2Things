@@ -13,7 +13,7 @@ from io import BytesIO
 import json
 import logging
 import requests
-from .errorUtil import get_jsonified_error, ERRORS
+from errorUtil import get_jsonified_error
 
 # from dotenv import load_dotenv
 load_dotenv() # Load environment variables from .env file
@@ -319,12 +319,14 @@ def get_recommendations():
         # Example: Fetching user's top pins (Pinterest API might vary)
         # You'll need to consult Pinterest API docs for specific "recommendation" endpoints.
         # For this example, let's fetch some dummy data or user's boards again.
-        
-        board_url = request.args.get('board_url')
-        print(f"Received board_url from frontend: {board_url}") # For debugging
-        if not board_url:
-            return jsonify({"error": "Missing 'board_url' parameter"}), 400
-        
+
+        board_name = request.args.get('board')
+        print(f"Received board name from frontend: {board_name}") # For debugging
+        if not board_name:
+            return jsonify({"error": "Missing 'board_name' parameter"}), 400
+
+        board_name = board_name.strip().lower()
+
         # Example: Get current user's boards again
         boards_url = "https://api.pinterest.com/v5/boards/";
         headers = {
@@ -335,13 +337,12 @@ def get_recommendations():
         boards_response.raise_for_status()
         boards_data = boards_response.json().get('items', []) # Assuming 'items' contains boards
 
-        
         # You would process 'boards_data' or other API results into your recommendations
         recommendations = [
             {"id": board.get('id'), "name": board.get('name'), "description": board.get('description')}
             for board in boards_data
         ]   
-        userEnteredBoardName = board_url.split('/')[-2].lower() if board_url else None
+        userEnteredBoardName = board_name
         currentBoardId = None
         for board in boards_data:
             if board.get('name').lower() == userEnteredBoardName:

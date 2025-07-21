@@ -20,9 +20,7 @@ const recommendationToCardItemMapper = (recommendations) => {
 };
 
 export default function PinterestRecommender() {
-  const [url, setUrl] = useState(
-    "https://in.pinterest.com/noornimrat2000/cowgirl/"
-  );
+  const [boardName, setBoardName] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
   const [error, setError] = useState(null);
@@ -30,9 +28,7 @@ export default function PinterestRecommender() {
   const fetchRecommendations = async () => {
     try {
       setIsLoading(true);
-      const recommendations = await getRecommendations(
-        "https://in.pinterest.com/noornimrat2000/cowgirl/"
-      ); // Replace with actual board URL
+      const recommendations = await getRecommendations(boardName); // Replace with actual board
       setRecommendations(recommendationToCardItemMapper(recommendations));
       console.log("Fetched recommendations:", recommendations);
     } catch (error) {
@@ -97,11 +93,11 @@ export default function PinterestRecommender() {
                 <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 px-6 py-3 rounded-full mb-4">
                   <Search className="w-5 h-5 text-purple-600" />
                   <span className="text-gray-700 font-semibold">
-                    Enter Pinterest Board URL
+                    Enter the name of Pinterest Board
                   </span>
                 </div>
                 <p className="text-gray-500">
-                  Paste any Pinterest board URL and let our AI analyze your
+                  Enter any Pinterest board and let our AI analyze your
                   aesthetic preferences
                 </p>
               </div>
@@ -116,10 +112,10 @@ export default function PinterestRecommender() {
                     <Search className="w-5 h-5 text-gray-400" />
                   </div>
                   <Input
-                    type="url"
-                    placeholder="https://www.pinterest.com/user/board-name/"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
+                    type="text"
+                    placeholder="Enter Pinterest board name"
+                    value={boardName}
+                    onChange={(e) => setBoardName(e.target.value)}
                     className="w-full pl-12 pr-4 py-5 text-base border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white/90 transition-all duration-200 placeholder:text-gray-400"
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
@@ -130,7 +126,7 @@ export default function PinterestRecommender() {
                   <Button
                     type="submit"
                     className="w-full py-5 text-lg font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
-                    disabled={!url.trim()}
+                    disabled={!boardName?.trim()}
                   >
                     <Zap className="w-5 h-5 mr-2" />
                     Analyze My Aesthetic
