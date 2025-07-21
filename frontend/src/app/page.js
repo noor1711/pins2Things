@@ -8,6 +8,7 @@ import { Search, Zap, Eye, Sparkles, Star, Palette } from "lucide-react";
 import "./globals.css"; // Import global styles
 import { getRecommendations } from "@/lib/utils";
 import StyledCarousel from "@/components/Carousel";
+import ErrorMessage from "@/components/ErrorMessage";
 
 const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
@@ -24,6 +25,7 @@ export default function PinterestRecommender() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
+  const [error, setError] = useState(null);
 
   const fetchRecommendations = async () => {
     try {
@@ -35,6 +37,7 @@ export default function PinterestRecommender() {
       console.log("Fetched recommendations:", recommendations);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
+      setError(error.message || "Failed to fetch recommendations");
     } finally {
       setIsLoading(false);
     }
@@ -47,6 +50,7 @@ export default function PinterestRecommender() {
       fetchRecommendations(); // Simulate successful connection for demo purposes
     } catch (error) {
       console.error("Error doing Oauth connection", error);
+      setError(error.message || "Failed to connect to Pinterest");
     }
   };
   return (
@@ -61,6 +65,7 @@ export default function PinterestRecommender() {
       <div className="container mx-auto px-4 py-16 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
+          <ErrorMessage error={error} onDismiss={() => setError(null)} />
           <div className="flex items-center justify-center gap-4 mb-6">
             <div className="relative">
               <Palette className="w-10 h-10 text-purple-600" />

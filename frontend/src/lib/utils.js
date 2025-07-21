@@ -14,14 +14,11 @@ export const getRecommendations = async (input) => {
       }?board_url=${encodeURIComponent(input)}`,
       { credentials: "include" }
     );
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to fetch recommendations");
-    }
+
     const data = await response.json();
     return data;
   } catch (err) {
     console.error("Error fetching recommendations:", err);
-    return null;
+    throw err;
   }
 };
