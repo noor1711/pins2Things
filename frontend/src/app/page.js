@@ -183,7 +183,7 @@ export default function PinterestRecommender() {
         {/* Creative Quote */}
         <div className="mt-20 text-center">
           <blockquote className="text-xl md:text-2xl font-medium text-gray-700 italic">
-            "Every Pinterest board tells a story about who you are."
+            Every Pinterest board tells a story about who you are.
           </blockquote>
           <div className="flex items-center justify-center gap-2 mt-4">
             <div className="w-8 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400"></div>
