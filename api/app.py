@@ -13,7 +13,7 @@ from io import BytesIO
 import json
 import logging
 import requests
-from errorUtil import get_jsonified_error, ERRORS
+from .errorUtil import get_jsonified_error, ERRORS
 
 # from dotenv import load_dotenv
 load_dotenv() # Load environment variables from .env file
