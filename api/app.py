@@ -13,6 +13,8 @@ from io import BytesIO
 import json
 import logging
 import requests
+from errorUtil import get_jsonified_error, ERRORS
+
 # from dotenv import load_dotenv
 load_dotenv() # Load environment variables from .env file
 
@@ -213,22 +215,15 @@ def user_status():
     """
     Checks if the current user's session holds valid Pinterest authentication tokens.
     """
-    # The get_valid_pinterest_token() function (from our previous discussion)
-    # already handles checking if the access token is expired and refreshing it.
     token = get_valid_pinterest_token()
     if token:
-        # If a valid token is returned, the user is authenticated.
-        # You could also add user-specific data from your session here if needed.
         return jsonify({"isAuthenticated": True, "message": "Authenticated with Pinterest"})
     else:
-        # No valid token found or refresh failed, user is not authenticated.
-        # Ensure that get_valid_pinterest_token() clears tokens from session if refresh fails.
         return jsonify({"isAuthenticated": False, "message": "Not authenticated with Pinterest"})
 
 # --- Backend Endpoint to Initiate OAuth ---
 @app.route('/api/pinterest-auth-start')
 def pinterest_auth_start():
-    print("Starting Pinterest OAuth flow...")
     # For reading pins and boards: 'boards:read', 'pins:read', 'user_accounts:read'
     SCOPES = "boards:read,pins:read,user_accounts:read" # Comma-separated
     
@@ -239,6 +234,8 @@ def pinterest_auth_start():
         f"response_type=code&"
         f"scope={SCOPES}"
     )
+
+    logging.info("Starting Oauth flow: Redirecting to Pinterest OAuth URL")
     return redirect(auth_url)
 
 @app.route('/api/pinterest-callback')
@@ -247,12 +244,12 @@ def pinterest_callback():
     error = request.args.get('error')
 
     if error:
-        print(f"Pinterest authorization error: {error}")
+        logging.error(f"Pinterest authorization error: {error}")
         # Redirect to frontend with error status and message
         return redirect(f"{FRONTEND_HOME_URL}/?status=error&message={error}")
 
     if not code:
-        print("No authorization code received from Pinterest.")
+        logging.error("No authorization code received from Pinterest.")
         return redirect(f"{FRONTEND_HOME_URL}/?status=error&message=No_code_received")
 
     # Exchange the authorization code for an access token
@@ -311,7 +308,13 @@ def get_recommendations():
     access_token = get_valid_pinterest_token()
     if not access_token:   
         return jsonify({"error": "User not authenticated with Pinterest"}), 401
-    
+
+    recommendationsGenerated = session.get('recommendations_generated', 0)
+
+    logging.info("Recommendations Generated:", recommendationsGenerated)
+
+    if recommendationsGenerated >= 1:
+        return get_jsonified_error("TOO_MANY_REQUESTS")
     try:
         # Example: Fetching user's top pins (Pinterest API might vary)
         # You'll need to consult Pinterest API docs for specific "recommendation" endpoints.
@@ -338,9 +341,7 @@ def get_recommendations():
             {"id": board.get('id'), "name": board.get('name'), "description": board.get('description')}
             for board in boards_data
         ]   
-        print(boards_data) # For debugging
         userEnteredBoardName = board_url.split('/')[-2].lower() if board_url else None
-        print(f"User entered board name: {userEnteredBoardName}") # For debugging
         currentBoardId = None
         for board in boards_data:
             if board.get('name').lower() == userEnteredBoardName:
@@ -353,12 +354,12 @@ def get_recommendations():
         pins_response = requests.get(pins_url, headers=headers)
         pins_response.raise_for_status()
         pins_data = pins_response.json().get('items', []) # Assuming 'items' contains pins      
-        print(f"Fetched {len(pins_data)} pins from board {currentBoardId}") # For debugging
-        print(pins_data) # For debugging
         pin_urls = [pin.get('media', {}).get('images', {}).get('600x', {}).get('url', '') for pin in pins_data if pin.get('media')]
         print(f"Extracted {len(pin_urls)} pin image URLs") # For debugging
         # get recommendations based on pin URLs
         recommendations = getRecommendations(pin_urls)
+
+        session['recommendations_generated'] = recommendationsGenerated + 1
         return jsonify(recommendations), 200
 
     except requests.exceptions.HTTPError as e:
