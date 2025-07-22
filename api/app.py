@@ -150,7 +150,8 @@ def getRecommendations(pin_image_urls):
     overall_search_query_parts = []
     recommendations = []
 
-    for img_url in pin_image_urls:
+    # this needs to be handled in a better manner, but for now we limit to 5 images
+    for img_url in pin_image_urls[:5]:  # Limit to first 5 images for performance
         img = get_image_from_url(img_url)
         if img:
             gemini_output = analyze_image_with_gemini(img)
@@ -350,12 +351,13 @@ def get_recommendations():
         board_name = board_name.strip().lower()
 
         # Example: Get current user's boards again
-        boards_url = "https://api.pinterest.com/v5/boards/";
+        boards_url = "https://api.pinterest.com/v5/boards?page_size=250";
         headers = {
             "Authorization": f"Bearer {access_token}",
             'Content-Type': 'application/json'
         }
         boards_response = requests.get(boards_url, headers=headers)
+        print("Board response status code:", boards_response.status_code,[board.get('name') for board in boards_response.json().get('items', [])]) # For debugging
         boards_response.raise_for_status()
         boards_data = boards_response.json().get('items', []) # Assuming 'items' contains boards
 
