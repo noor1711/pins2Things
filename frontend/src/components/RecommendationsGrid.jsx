@@ -47,7 +47,7 @@ const RecommendationGrid = ({ items }) => {
                     {item?.title}
                   </h3>
 
-                  <Link href={item?.link} className="block">
+                  <Link target="_blank" href={item?.link} className="block">
                     <Button className="w-full py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-purple-700 border-2 border-purple-200 hover:border-purple-300 transform hover:scale-[1.02] transition-all duration-200">
                       <Sparkles className="w-4 h-4 mr-2" />
                       Shop Now

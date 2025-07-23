@@ -18,23 +18,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      // get auth info from end point
-      fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}`, {
-        credentials: "include",
-        method: "GET",
+    // get auth info from end point
+    fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}`, {
+      credentials: "include",
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setIsAuthenticated(!!data?.isAuthenticated);
+        // create an error context
       })
-        .then((response) => response.json())
-        .then((data) => {
-          setIsAuthenticated(!!data?.isAuthenticated);
-          if (!data?.isAuthenticated) {
-            authenticateUser();
-          }
-        })
-        .finally(() => {
-          setIsLoadingAuth(false);
-        });
-    }
+      .finally(() => {
+        setIsLoadingAuth(false);
+      });
   }, []);
 
   return (
@@ -42,6 +38,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         isAuthenticated,
         isLoadingAuth,
+        authenticateUser,
       }}
     >
       {children}

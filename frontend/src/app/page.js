@@ -10,6 +10,7 @@ import { getRecommendations } from "@/lib/utils";
 import ErrorMessage from "@/components/ErrorMessage";
 import SkeletonGrid from "@/components/SkeletonGrid";
 import RecommendationGrid from "@/components/RecommendationsGrid";
+import { useAuth } from "@/context/AuthContext";
 
 const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
@@ -25,6 +26,7 @@ export default function PinterestRecommender() {
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
   const [error, setError] = useState(null);
+  const { isAuthenticated, authenticateUser } = useAuth();
 
   const fetchRecommendations = async () => {
     try {
@@ -44,7 +46,11 @@ export default function PinterestRecommender() {
     e.preventDefault();
     try {
       // This is the URL of your backend endpoint that starts the OAuth flow
-      fetchRecommendations(); // Simulate successful connection for demo purposes
+      if (!isAuthenticated) {
+        await authenticateUser();
+      } else {
+        fetchRecommendations(); // Simulate successful connection for demo purposes
+      }
     } catch (error) {
       console.error("Error doing Oauth connection", error);
       setError(error.message || "Failed to connect to Pinterest");
