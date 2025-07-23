@@ -4,11 +4,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Zap, Eye, Sparkles, Star, Palette } from "lucide-react";
+import { Search, Zap, Eye, Sparkles, Palette } from "lucide-react";
 import "./globals.css"; // Import global styles
 import { getRecommendations } from "@/lib/utils";
-import StyledCarousel from "@/components/Carousel";
 import ErrorMessage from "@/components/ErrorMessage";
+import SkeletonGrid from "@/components/SkeletonGrid";
+import RecommendationGrid from "@/components/RecommendationsGrid";
 
 const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
@@ -49,6 +50,7 @@ export default function PinterestRecommender() {
       setError(error.message || "Failed to connect to Pinterest");
     }
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-purple-50">
       {/* Subtle background pattern */}
@@ -117,20 +119,34 @@ export default function PinterestRecommender() {
                     value={boardName}
                     onChange={(e) => setBoardName(e.target.value)}
                     className="w-full pl-12 pr-4 py-5 text-base border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white/90 transition-all duration-200 placeholder:text-gray-400"
+                    disabled={isLoading}
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
+                    {isLoading ? (
+                      <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
+                    )}
                   </div>
                 </div>
                 <div className="mt-4">
                   <Button
                     type="submit"
-                    className="w-full py-5 text-lg font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
-                    disabled={!boardName?.trim()}
+                    className="w-full py-5 text-lg font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    disabled={!boardName?.trim() || isLoading}
                   >
-                    <Zap className="w-5 h-5 mr-2" />
-                    Analyze My Aesthetic
-                    <Sparkles className="w-5 h-5 ml-2" />
+                    {isLoading ? (
+                      <>
+                        <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5 mr-2" />
+                        Analyze My Aesthetic
+                        <Sparkles className="w-5 h-5 ml-2" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </form>
@@ -138,7 +154,12 @@ export default function PinterestRecommender() {
           </CardContent>
         </Card>
 
-        <StyledCarousel items={recommendations} />
+        {isLoading ? (
+          <SkeletonGrid message="Discovering products that match your aesthetic perfectly..." />
+        ) : recommendations ? (
+          <RecommendationGrid items={recommendations} />
+        ) : null}
+
         {/* Features Section */}
         <div className="mt-20 grid md:grid-cols-3 gap-8">
           <div className="text-center group">

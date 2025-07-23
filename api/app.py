@@ -336,7 +336,7 @@ def get_recommendations():
 
     logging.info("Recommendations Generated:", recommendationsGenerated)
 
-    if recommendationsGenerated >= 1:
+    if recommendationsGenerated >= 2:
         return get_jsonified_error("TOO_MANY_REQUESTS")
     try:
         # Example: Fetching user's top pins (Pinterest API might vary)
