@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,8 @@ import ErrorMessage from "@/components/ErrorMessage";
 import SkeletonGrid from "@/components/SkeletonGrid";
 import RecommendationGrid from "@/components/RecommendationsGrid";
 import { useAuth } from "@/context/AuthContext";
+import ConsentModal from "@/components/ConsentModal";
+import { useSearchParams } from "next/navigation";
 
 const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
@@ -27,6 +29,15 @@ export default function PinterestRecommender() {
   const [recommendations, setRecommendations] = useState(null);
   const [error, setError] = useState(null);
   const { isAuthenticated, authenticateUser } = useAuth();
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const board = searchParams.get("board");
+    if (!!board) {
+      setBoardName(board);
+    }
+  }, [searchParams]);
 
   const fetchRecommendations = async () => {
     try {
@@ -44,10 +55,16 @@ export default function PinterestRecommender() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    if (!boardName?.trim()) {
+      setError("Please enter a Pinterest board name");
+      return;
+    }
+
     try {
       // This is the URL of your backend endpoint that starts the OAuth flow
       if (!isAuthenticated) {
-        await authenticateUser();
+        setShowConsentModal(true);
       } else {
         fetchRecommendations(); // Simulate successful connection for demo purposes
       }
@@ -55,6 +72,21 @@ export default function PinterestRecommender() {
       console.error("Error doing Oauth connection", error);
       setError(error.message || "Failed to connect to Pinterest");
     }
+  };
+
+  const handleConsent = async () => {
+    setShowConsentModal(false);
+    setError(null);
+    try {
+      await authenticateUser(boardName);
+    } catch (error) {
+      console.error("Error in consent flow:", error);
+      setError(error.message || "Failed to connect to Pinterest");
+    }
+  };
+
+  const handleConsentClose = () => {
+    setShowConsentModal(false);
   };
 
   return (
@@ -109,12 +141,7 @@ export default function PinterestRecommender() {
                   aesthetic preferences
                 </p>
               </div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleFormSubmit(e);
-                }}
-              >
+              <form onSubmit={handleFormSubmit}>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200 group-focus-within:text-purple-600">
                     <Search className="w-5 h-5 text-gray-400" />
@@ -160,6 +187,7 @@ export default function PinterestRecommender() {
           </CardContent>
         </Card>
 
+        {/* Recommendations Section */}
         {isLoading ? (
           <SkeletonGrid message="Discovering products that match your aesthetic perfectly..." />
         ) : recommendations ? (
@@ -230,6 +258,14 @@ export default function PinterestRecommender() {
           </a>
         </div>
       </div>
+
+      {/* Consent Modal */}
+      <ConsentModal
+        isOpen={showConsentModal}
+        onClose={handleConsentClose}
+        onConsent={handleConsent}
+        boardName={boardName}
+      />
     </div>
   );
 }

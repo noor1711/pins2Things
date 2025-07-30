@@ -9,9 +9,13 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const router = useRouter(); // Hook to programmatically navigate users
 
-  const authenticateUser = async () => {
+  const authenticateUser = async (board) => {
     try {
-      router.push(`${process.env.NEXT_PUBLIC_BACKEND_URL}`);
+      router.push(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}?board=${encodeURIComponent(
+          board
+        )}`
+      );
     } catch (error) {
       console.error("Error during authentication:", error);
     }
