@@ -249,6 +249,8 @@ def user_status():
 def pinterest_auth_start():
     # For reading pins and boards: 'boards:read', 'pins:read', 'user_accounts:read'
     SCOPES = "boards:read,pins:read,user_accounts:read" # Comma-separated
+    boardName = request.args.get('board')
+    session['boardName'] = boardName
     
     auth_url = (
         f"{PINTEREST_AUTHORIZE_URL}?"
@@ -309,7 +311,10 @@ def pinterest_callback():
         session['pinterest_refresh_token'] = token_data.get('refresh_token') # Store refresh token if available
         session['pinterest_access_token_expiry'] = (datetime.now() + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat() # Store expiry time
         session['pinterest_refresh_token_expiry'] = (datetime.now() + timedelta(seconds=token_data.get('refresh_token_expires_in', 3600))).isoformat() # Store refresh token expiry time
-        return redirect(f"{FRONTEND_HOME_URL}/?status=success")
+        boardName = request.args.get('board')
+        boardName = session.get('boardName')
+        
+        return redirect(f"{FRONTEND_HOME_URL}/?board={boardName}")
 
     except requests.exceptions.HTTPError as e:
         print(f"HTTP Error during token exchange: {e.response.status_code} - {e.response.text}")
