@@ -99,7 +99,7 @@ async def analyze_image_with_gemini(image):
     try:
         await asyncio.sleep(random())
         logging.info("Requesting gemini content generation at", datetime.now())
-        response = await gemini_model.generate_content_async([prompt, image])
+        response = gemini_model.generate_content([prompt, image])
         response_text = response.text.strip()
         try:
             result = json.loads(response_text)
