@@ -133,6 +133,7 @@ def perform_google_cse_search(query):
         response = requests.get(search_url, params=params)
         response.raise_for_status()
         data = response.json()
+        logging.info(f"Google CSE performed for {query}")
         results = []
         for item in data.get("items", []):
             results.append({
