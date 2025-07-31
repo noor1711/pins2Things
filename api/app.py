@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+from random import random
 from flask.cli import load_dotenv
 import requests
 import base64
@@ -13,6 +14,7 @@ from io import BytesIO
 import json
 import logging
 import requests
+import asyncio
 
 ERRORS = {
     "TOO_MANY_REQUESTS": {
@@ -81,7 +83,7 @@ def get_image_from_url(url):
         logging.error(f"Error fetching/processing image from URL {url}: {e}")
         return None
 
-def analyze_image_with_gemini(image):
+async def analyze_image_with_gemini(image):
     if not image:
         return {"keywords": [], "search_query": ""}
     prompt = """
@@ -95,7 +97,9 @@ def analyze_image_with_gemini(image):
     }
     """
     try:
-        response = gemini_model.generate_content([prompt, image])
+        await asyncio.sleep(random())
+        logging.info("Requesting gemini content generation at", datetime.now())
+        response = await gemini_model.generate_content_async([prompt, image])
         response_text = response.text.strip()
         try:
             result = json.loads(response_text)
@@ -141,8 +145,8 @@ def perform_google_cse_search(query):
     except Exception as e:
         logging.error(f"Error performing Google CSE search for '{query}': {e}")
         return []
-
-def getRecommendations(pin_image_urls):
+    
+async def getRecommendations(pin_image_urls):
     if not pin_image_urls:
         return jsonify({"error": "Could not fetch images. Check board or API."}), 500
 
@@ -150,11 +154,18 @@ def getRecommendations(pin_image_urls):
     overall_search_query_parts = []
     recommendations = []
 
-    # this needs to be handled in a better manner, but for now we limit to 5 images
-    for img_url in pin_image_urls[:5]:  # Limit to first 5 images for performance
-        img = get_image_from_url(img_url)
-        if img:
-            gemini_output = analyze_image_with_gemini(img)
+    validImages = [get_image_from_url(img_url) for img_url in pin_image_urls if img_url]
+    
+    tasks = []
+    for image in validImages:
+        task = asyncio.create_task(
+            coro=analyze_image_with_gemini(image)
+        )    
+        tasks.append(task)
+    
+    results = await asyncio.gather(*tasks)
+
+    for gemini_output in results:  
             all_keywords.update(gemini_output["keywords"])
             if gemini_output["search_query"]:
                 overall_search_query_parts.append(gemini_output["search_query"])
@@ -328,7 +339,7 @@ def pinterest_callback():
 # Endpoint for frontend to fetch recommendations (after the redirect)
 # This assumes you stored the access_token in the session for the user
 @app.route('/api/get-recommendations', methods=['GET'])
-def get_recommendations():
+async def get_recommendations():
     access_token = get_valid_pinterest_token()
     if not access_token:
         return redirect("pinterest-auth-start") # Redirect to start OAuth flow if no valid token
@@ -387,8 +398,7 @@ def get_recommendations():
         pin_urls = [pin.get('media', {}).get('images', {}).get('600x', {}).get('url', '') for pin in pins_data if pin.get('media')]
         print(f"Extracted {len(pin_urls)} pin image URLs") # For debugging
         # get recommendations based on pin URLs
-        recommendations = getRecommendations(pin_urls)
-
+        recommendations = await getRecommendations(pin_urls[:5])
         session['recommendations_generated'] = recommendationsGenerated + 1
         return jsonify(recommendations), 200
 
