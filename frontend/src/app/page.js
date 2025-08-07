@@ -18,8 +18,8 @@ const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
     id: index,
     title: item.title,
-    image: item.thumbnail || "/placeholder.svg?height=200&width=200", // Fallback image
-    link: item.link || "#", // Fallback link
+    image: item.thumbnail || "/placeholder.svg?height=200&width=200",
+    link: item.link || "#",
   }));
 };
 
@@ -90,176 +90,108 @@ export default function PinterestRecommender() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-purple-50">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-purple-500 rounded-full blur-3xl"></div>
-        <div className="absolute top-60 right-32 w-24 h-24 bg-blue-500 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-40 left-1/3 w-28 h-28 bg-pink-500 rounded-full blur-3xl"></div>
+    <div className="min-h-screen relative bg-black text-white">
+      {/* Neon ambient glows */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.22]">
+        <div className="absolute -top-10 -left-10 w-60 h-60 bg-emerald-500 rounded-full blur-3xl" />
+        <div className="absolute top-40 right-10 w-52 h-52 bg-lime-400 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-1/3 w-56 h-56 bg-amber-400 rounded-full blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 py-16 max-w-4xl relative z-10">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <ErrorMessage error={error} onDismiss={() => setError(null)} />
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="relative">
-              <Palette className="w-10 h-10 text-purple-600" />
-              <Sparkles className="w-4 h-4 text-pink-500 absolute -top-1 -right-1" />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-              Pinterest Aesthetic
-            </h1>
+      <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
+        <ErrorMessage error={error} onDismiss={() => setError(null)} />
+        <header className="mb-10 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 bg-neutral-900 border border-neutral-800 text-neutral-300 mb-3">
+            <Sparkles className="w-4 h-4 text-lime-400" />
+            <span className="text-xs font-medium">Aesthetic matcher</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">
-            Recommender
-          </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
-            Transform your Pinterest boards into personalized aesthetic
-            insights.
-            <span className="text-purple-600 font-medium">
-              {" "}
-              Discover your unique visual style
-            </span>{" "}
-            with AI-powered analysis.
+          <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-emerald-500 via-lime-400 to-amber-400 bg-clip-text text-transparent">
+            Pinterest Aesthetic Recommender
+          </h1>
+          <p className="text-neutral-300 mt-3">
+            Paste a board name and we&apos;ll find products that match your
+            vibe.
           </p>
-        </div>
+        </header>
 
-        {/* Main Search Card */}
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-          <CardContent className="p-8 md:p-12">
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 px-6 py-3 rounded-full mb-4">
-                  <Search className="w-5 h-5 text-purple-600" />
-                  <span className="text-gray-700 font-semibold">
-                    Enter the name of Pinterest Board
-                  </span>
-                </div>
-                <p className="text-gray-500">
-                  Enter any Pinterest board and let our AI analyze your
-                  aesthetic preferences
-                </p>
-              </div>
-              <form onSubmit={handleFormSubmit}>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200 group-focus-within:text-purple-600">
-                    <Search className="w-5 h-5 text-gray-400" />
+        <Card className="border border-neutral-800 bg-neutral-950 rounded-2xl">
+          <CardContent className="p-6 md:p-8">
+            <form onSubmit={handleFormSubmit} noValidate>
+              <label htmlFor="board" className="sr-only">
+                Pinterest board name
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
+                    <Search className="w-4 h-4" />
                   </div>
                   <Input
+                    id="board"
                     type="text"
                     placeholder="Enter Pinterest board name"
                     value={boardName}
                     onChange={(e) => setBoardName(e.target.value)}
-                    className="w-full pl-12 pr-4 py-5 text-base border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white/90 transition-all duration-200 placeholder:text-gray-400"
+                    className="pl-9 bg-neutral-950 text-neutral-100 placeholder-neutral-500 border-neutral-800 focus:border-emerald-400 focus-visible:ring-emerald-500/30 focus-visible:ring-4"
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "board-error" : undefined}
                     disabled={isLoading}
                   />
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {isLoading ? (
-                      <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="w-4 h-4 inline-block border-2 border-emerald-400/80 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
+                      <span className="inline-block w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-amber-400 animate-pulse" />
                     )}
                   </div>
                 </div>
-                <div className="mt-4">
-                  <Button
-                    type="submit"
-                    className="w-full py-5 text-lg font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    disabled={!boardName?.trim() || isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-5 h-5 mr-2" />
-                        Analyze My Aesthetic
-                        <Sparkles className="w-5 h-5 ml-2" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </div>
+                <Button
+                  type="submit"
+                  className="text-black bg-gradient-to-r from-emerald-500 via-lime-400 to-amber-400 hover:from-emerald-400 hover:via-lime-300 hover:to-amber-300"
+                  disabled={!boardName?.trim() || isLoading}
+                >
+                  {isLoading ? "Analyzing…" : "Analyze"}
+                </Button>
+              </div>
+              <div className="mt-2 min-h-[1.25rem]">
+                {error ? (
+                  <p id="board-error" className="text-sm text-amber-300">
+                    {error}
+                  </p>
+                ) : (
+                  <p className="text-xs text-neutral-400">
+                    We’ll ask permission before accessing your board.
+                  </p>
+                )}
+              </div>
+              <div className="sr-only" aria-live="polite">
+                {isLoading
+                  ? "Loading recommendations…"
+                  : recommendations
+                  ? "Recommendations ready."
+                  : ""}
+              </div>
+            </form>
           </CardContent>
         </Card>
 
-        {/* Recommendations Section */}
-        {isLoading ? (
-          <SkeletonGrid message="Discovering products that match your aesthetic perfectly..." />
-        ) : recommendations ? (
-          <RecommendationGrid items={recommendations} />
-        ) : null}
+        <section className="mt-8">
+          {isLoading ? (
+            <SkeletonGrid message="Discovering products that match your aesthetic…" />
+          ) : recommendations ? (
+            <RecommendationGrid items={recommendations} />
+          ) : null}
+        </section>
 
-        {/* Features Section */}
-        <div className="mt-20 grid md:grid-cols-3 gap-8">
-          <div className="text-center group">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-200">
-              <Eye className="w-8 h-8 text-purple-600" />
-            </div>
-            <h3 className="font-bold text-xl text-gray-900 mb-3">
-              Visual Intelligence
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              Advanced AI analyzes colors, patterns, and visual themes to
-              understand your unique aesthetic DNA
-            </p>
-          </div>
-
-          <div className="text-center group">
-            <div className="w-16 h-16 bg-gradient-to-br from-pink-100 to-pink-200 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-200">
-              <Sparkles className="w-8 h-8 text-pink-600" />
-            </div>
-            <h3 className="font-bold text-xl text-gray-900 mb-3">
-              Curated Magic
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              Get personalized recommendations that perfectly match your style
-              preferences and creative vision
-            </p>
-          </div>
-
-          <div className="text-center group">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-200">
-              <Zap className="w-8 h-8 text-blue-600" />
-            </div>
-            <h3 className="font-bold text-xl text-gray-900 mb-3">
-              Instant Insights
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              Discover your aesthetic profile in seconds with real-time analysis
-              and beautiful visualizations
-            </p>
-          </div>
-        </div>
-
-        {/* Creative Quote */}
-        <div className="mt-20 text-center">
-          <blockquote className="text-xl md:text-2xl font-medium text-gray-700 italic">
-            Every Pinterest board tells a story about who you are.
-          </blockquote>
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <div className="w-8 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400"></div>
-            <Palette className="w-5 h-5 text-purple-500" />
-            <div className="w-8 h-0.5 bg-gradient-to-r from-pink-400 to-blue-400"></div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-16 pt-8 border-t border-gray-200">
+        <footer className="mt-12 pt-6 border-t border-neutral-800 text-center">
           <a
             href="/privacy-policy"
-            className="text-purple-600 hover:text-pink-600 font-medium transition-colors duration-200"
+            className="text-sm text-neutral-400 hover:text-neutral-200 underline underline-offset-4"
           >
-            Privacy Policy
+            Privacy policy
           </a>
-        </div>
+        </footer>
       </div>
 
-      {/* Consent Modal */}
       <ConsentModal
         isOpen={showConsentModal}
         onClose={handleConsentClose}
