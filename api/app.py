@@ -127,7 +127,7 @@ def perform_google_cse_search(query):
         "key": GOOGLE_CSE_API_KEY,
         "cx": GOOGLE_CSE_ID,
         "q": query,
-        "num": 3,
+        "num": 5,
     }
     try:
         response = requests.get(search_url, params=params)
@@ -176,6 +176,7 @@ async def getRecommendations(pin_image_urls):
     if not final_search_query and final_keywords:
          final_search_query = " ".join(final_keywords) + ("price" if len(final_keywords) > 0 else "") + "-reviews -news"
 
+    logging.info(f"Final Search Query: {final_search_query}")
     if final_search_query:
         cse_results = perform_google_cse_search(final_search_query)
         recommendations.extend(cse_results)
