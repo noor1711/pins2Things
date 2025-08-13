@@ -83,6 +83,42 @@ def get_image_from_url(url):
         logging.error(f"Error fetching/processing image from URL {url}: {e}")
         return None
 
+async def analyze_images_with_gemini(images):
+    if not len(images):
+        return {"keywords": [], "search_query": ""}
+    prompt = """
+    Analyze the aesthetic of these images. Identify key objects, color palette, and general mood.
+    Generate 3-5 concise, comma-separated keywords representing the core aesthetic and any prominent product types.
+    Also, provide a single, broad Google Search query (e.g., 'minimalist home decor products') that captures the overall style for finding related products.
+    Format your response strictly as JSON:
+    {
+        "keywords": ["keyword1", "keyword2", "keyword3"],
+        "search_query": "Your descriptive search query"
+    }
+    """
+    try:
+        logging.info("Requesting gemini content generation at", datetime.now())
+        await asyncio.sleep(random())
+        response = gemini_model.generate_content([prompt, *images])
+        response_text = response.text.strip()
+        try:
+            result = json.loads(response_text)
+            return result
+        except json.JSONDecodeError:
+            logging.warning(f"Gemini response not perfect JSON, attempting fallback parsing: {response_text}")
+            keywords = []
+            search_query = ""
+            if "keywords" in response_text:
+                k_match = response_text.split('"keywords": [')[1].split(']')[0]
+                keywords = [kw.strip().strip('"') for kw in k_match.split(',') if kw.strip()]
+            if "search_query" in response_text:
+                s_match = response_text.split('"search_query": "')[1].split('"')[0]
+                search_query = s_match
+            return {"keywords": keywords, "search_query": search_query}
+    except Exception as e:
+        logging.error(f"Error analyzing image with Gemini: {e}")
+        return {"keywords": [], "search_query": ""}
+
 async def analyze_image_with_gemini(image):
     if not image:
         return {"keywords": [], "search_query": ""}
@@ -157,14 +193,16 @@ async def getRecommendations(pin_image_urls):
 
     validImages = [get_image_from_url(img_url) for img_url in pin_image_urls if img_url]
     
-    tasks = []
-    for image in validImages:
-        task = asyncio.create_task(
-            coro=analyze_image_with_gemini(image)
-        )    
-        tasks.append(task)
+    # tasks = []
+    # for image in validImages:
+    #     task = asyncio.create_task(
+    #         coro=analyze_image_with_gemini(image)
+    #     )    
+    #     tasks.append(task)
     
-    results = await asyncio.gather(*tasks)
+    # results = await asyncio.gather(*tasks)
+
+    results = [await analyze_images_with_gemini(validImages)]
 
     for gemini_output in results:  
             all_keywords.update(gemini_output["keywords"])
@@ -177,7 +215,7 @@ async def getRecommendations(pin_image_urls):
          final_search_query = " ".join(final_keywords)
 
     if len(final_search_query):
-        final_search_query = final_search_query + " price" + " -reviews -news"
+        final_search_query = final_search_query + " buy -reviews -news -site:reddit.com -site:pinterest.com"
 
     print(f"Final Search Query: {final_search_query}")
     if final_search_query:
