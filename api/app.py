@@ -174,9 +174,12 @@ async def getRecommendations(pin_image_urls):
     final_keywords = list(all_keywords)
     final_search_query = " ".join(sorted(list(set(overall_search_query_parts))))
     if not final_search_query and final_keywords:
-         final_search_query = " ".join(final_keywords) + ("price" if len(final_keywords) > 0 else "") + "-reviews -news"
+         final_search_query = " ".join(final_keywords)
 
-    logging.info(f"Final Search Query: {final_search_query}")
+    if len(final_search_query):
+        final_search_query = final_search_query + " price" + " -reviews -news"
+
+    print(f"Final Search Query: {final_search_query}")
     if final_search_query:
         cse_results = perform_google_cse_search(final_search_query)
         recommendations.extend(cse_results)
