@@ -24,7 +24,9 @@ const recommendationToCardItemMapper = (recommendations) => {
 };
 
 export default function PinterestRecommender() {
-  const [boardName, setBoardName] = useState();
+  const [activeTab, setActiveTab] = useState("board"); // "board" or "pins"
+  const [boardName, setBoardName] = useState("");
+  const [pinCount, setPinCount] = useState("25");
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
   const [error, setError] = useState(null);
@@ -55,8 +57,7 @@ export default function PinterestRecommender() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
-    if (!boardName?.trim()) {
+    if (activeTab === "board" && !boardName.trim()) {
       setError("Please enter a Pinterest board name");
       return;
     }
@@ -115,51 +116,131 @@ export default function PinterestRecommender() {
         </header>
 
         <Card className="border border-neutral-800 bg-neutral-950 rounded-2xl">
+          {/* Tab Navigation */}
+          <div className="flex border-b border-neutral-800">
+            <button
+              onClick={() => setActiveTab("board")}
+              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
+                activeTab === "board"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-white"
+                  : "text-gray-500 hover:text-gray-700 bg-gray-50/50"
+              }`}
+              disabled={isLoading}
+            >
+              Analyze Board
+            </button>
+            <button
+              onClick={() => setActiveTab("pins")}
+              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
+                activeTab === "pins"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-white"
+                  : "text-gray-500 hover:text-gray-700 bg-gray-50/50"
+              }`}
+              disabled={isLoading}
+            >
+              Analyze Recent Pins
+            </button>
+          </div>
+
           <CardContent className="p-6 md:p-8">
             <form onSubmit={handleFormSubmit} noValidate>
-              <label htmlFor="board" className="sr-only">
-                Pinterest board name
-              </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
-                    <Search className="w-4 h-4" />
-                  </div>
-                  <Input
-                    id="board"
-                    type="text"
-                    placeholder="Enter Pinterest board name"
-                    value={boardName}
-                    onChange={(e) => setBoardName(e.target.value)}
-                    className="pl-9 bg-neutral-950 text-neutral-100 placeholder-neutral-500 border-neutral-800 focus:border-emerald-400 focus-visible:ring-emerald-500/30 focus-visible:ring-4"
-                    aria-invalid={!!error}
-                    aria-describedby={error ? "board-error" : undefined}
-                    disabled={isLoading}
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {isLoading ? (
-                      <span className="w-4 h-4 inline-block border-2 border-emerald-400/80 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <span className="inline-block w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-amber-400 animate-pulse" />
-                    )}
+              {/* Board Tab Content */}
+              {activeTab === "board" && (
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="board"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Pinterest Board Name
+                    </label>
+                    <div className="relative">
+                      <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Search className="w-4 h-4" />
+                      </div>
+                      <Input
+                        id="board"
+                        type="text"
+                        placeholder="Enter Pinterest board name"
+                        value={boardName}
+                        onChange={(e) => setBoardName(e.target.value)}
+                        className="pl-9 bg-neutral-950 text-neutral-100 placeholder-neutral-500 border-neutral-800 focus:border-emerald-400 focus-visible:ring-emerald-500/30 focus-visible:ring-4"
+                        aria-invalid={!!error}
+                        aria-describedby={error ? "board-error" : undefined}
+                        disabled={isLoading}
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {isLoading ? (
+                          <span className="w-4 h-4 inline-block border-2 border-[#519755]/80 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <span className="inline-block w-2 h-2 rounded-full bg-gradient-to-r from-[#A8DCAB] to-[#BE91BE] animate-pulse" />
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      We'll analyze all pins from this specific board to
+                      understand your aesthetic.
+                    </p>
                   </div>
                 </div>
-                <Button
-                  type="submit"
-                  className="text-black bg-gradient-to-r from-emerald-500 via-lime-400 to-amber-400 hover:from-emerald-400 hover:via-lime-300 hover:to-amber-300"
-                  disabled={!boardName?.trim() || isLoading}
-                >
-                  {isLoading ? "Analyzing…" : "Analyze"}
-                </Button>
-              </div>
-              <div className="mt-2 min-h-[1.25rem]">
+              )}
+
+              {/* Pins Tab Content */}
+              {activeTab === "pins" && (
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="pinCount"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Number of Recent Pins to Analyze
+                    </label>
+                    <select
+                      id="pinCount"
+                      value={pinCount}
+                      onChange={(e) => setPinCount(e.target.value)}
+                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-200 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
+                      disabled={isLoading}
+                    >
+                      <option value="10">10 pins</option>
+                      <option value="25">25 pins</option>
+                      <option value="50">50 pins</option>
+                      <option value="100">100 pins</option>
+                      <option value="200">200 pins</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-2">
+                      We'll analyze your most recent pins across all boards to
+                      understand your current aesthetic preferences.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full text-white bg-gradient-to-r from-[#A8DCAB] via-[#519755] to-[#DBAAA7] hover:opacity-90 shadow-md py-3 mt-6"
+                disabled={
+                  (activeTab === "board" && !boardName.trim()) || isLoading
+                }
+              >
+                {isLoading
+                  ? "Analyzing…"
+                  : activeTab === "board"
+                  ? "Analyze Board"
+                  : "Analyze Recent Pins"}
+              </Button>
+
+              <div className="mt-4 min-h-[1.25rem]">
                 {error ? (
-                  <p id="board-error" className="text-sm text-amber-300">
+                  <p id="board-error" className="text-sm text-red-600">
                     {error}
                   </p>
                 ) : (
-                  <p className="text-xs text-neutral-400">
-                    We’ll ask permission before accessing your board.
+                  <p className="text-xs text-gray-500">
+                    {activeTab === "board"
+                      ? 'Tip: Press "/" to focus the board field. We\'ll ask permission before accessing your board.'
+                      : "We'll ask permission before accessing your recent pins."}
                   </p>
                 )}
               </div>
@@ -194,7 +275,7 @@ export default function PinterestRecommender() {
 
       <ConsentModal
         isOpen={showConsentModal}
-        onClose={handleConsentClose}
+        onClose={() => setShowConsentModal(false)}
         onConsent={handleConsent}
         boardName={boardName}
       />
