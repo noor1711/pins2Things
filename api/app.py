@@ -379,6 +379,59 @@ def pinterest_callback():
         error_message = f"Network_Error: {str(e)}"
         return redirect(f"{FRONTEND_HOME_URL}/?status=error&message={error_message}")
 
+def get_board_image_urls(board_name):
+    access_token = get_valid_pinterest_token()
+    board_name = board_name.strip().lower()
+
+        # Example: Get current user's boards again
+    boards_url = "https://api.pinterest.com/v5/boards?page_size=250";
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        'Content-Type': 'application/json'
+    }
+    boards_response = requests.get(boards_url, headers=headers)
+    print("Board response status code:", boards_response.status_code,[board.get('name') for board in boards_response.json().get('items', [])]) # For debugging
+    boards_response.raise_for_status()
+    boards_data = boards_response.json().get('items', []) # Assuming 'items' contains boards
+
+    # You would process 'boards_data' or other API results into your recommendations
+    userEnteredBoardName = board_name
+    currentBoardId = None
+    for board in boards_data:
+        if board.get('name').lower() == userEnteredBoardName:
+            currentBoardId = board.get('id')
+            break   
+    if not currentBoardId:
+        return jsonify({"error": "Board not found"}), 404   
+    # Now fetch pins from the specific board
+    pins_url = f"https://api.pinterest.com/v5/boards/{currentBoardId}/pins/"
+    pins_response = requests.get(pins_url, headers=headers)
+    pins_response.raise_for_status()
+    pins_data = pins_response.json().get('items', []) # Assuming 'items' contains pins      
+    pin_urls = [pin.get('media', {}).get('images', {}).get('600x', {}).get('url', '') for pin in pins_data if pin.get('media')]
+    print(f"Extracted {len(pin_urls)} pin image URLs") # For debugging
+    return pin_urls
+
+def get_latest_image_urls(page_size):
+    access_token = get_valid_pinterest_token()
+    if not access_token:
+        return jsonify({"error": "User not authenticated with Pinterest"}), 401
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        'Content-Type': 'application/json'
+    }
+
+    # Fetch the latest pins from the user's boards
+    pins_url = f"https://api.pinterest.com/v5/pins/?page_size={page_size}"
+    latest_pins_response = requests.get(pins_url, headers=headers)
+    latest_pins_response.raise_for_status()
+    latest_pins_data = latest_pins_response.json().get('items', [])
+    print("Logging latest image response", latest_pins_data)
+    latest_pin_urls = [pin.get('media', {}).get('images', {}).get('600x', {}).get('url', '') for pin in latest_pins_data if pin.get('media')]
+    print(f"Extracted {len(latest_pin_urls)} latest pin image URLs")  # For debugging
+    return latest_pin_urls
+
 # Endpoint for frontend to fetch recommendations (after the redirect)
 # This assumes you stored the access_token in the session for the user
 @app.route('/api/get-recommendations', methods=['GET'])
@@ -387,7 +440,6 @@ async def get_recommendations():
     if not access_token:
         return redirect("pinterest-auth-start") # Redirect to start OAuth flow if no valid token
     
-    access_token = get_valid_pinterest_token()
     if not access_token:   
         return jsonify({"error": "User not authenticated with Pinterest"}), 401
 
@@ -395,7 +447,7 @@ async def get_recommendations():
 
     logging.info("Recommendations Generated:", recommendationsGenerated)
 
-    if recommendationsGenerated >= 2:
+    if recommendationsGenerated >= 5:
         return get_jsonified_error("TOO_MANY_REQUESTS")
     try:
         # Example: Fetching user's top pins (Pinterest API might vary)
@@ -403,43 +455,12 @@ async def get_recommendations():
         # For this example, let's fetch some dummy data or user's boards again.
 
         board_name = request.args.get('board')
+        pin_size = request.args.get('pin_size')
         print(f"Received board name from frontend: {board_name}") # For debugging
-        if not board_name:
+        if not board_name and not pin_size:
             return jsonify({"error": "Missing 'board_name' parameter"}), 400
 
-        board_name = board_name.strip().lower()
-
-        # Example: Get current user's boards again
-        boards_url = "https://api.pinterest.com/v5/boards?page_size=250";
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            'Content-Type': 'application/json'
-        }
-        boards_response = requests.get(boards_url, headers=headers)
-        print("Board response status code:", boards_response.status_code,[board.get('name') for board in boards_response.json().get('items', [])]) # For debugging
-        boards_response.raise_for_status()
-        boards_data = boards_response.json().get('items', []) # Assuming 'items' contains boards
-
-        # You would process 'boards_data' or other API results into your recommendations
-        recommendations = [
-            {"id": board.get('id'), "name": board.get('name'), "description": board.get('description')}
-            for board in boards_data
-        ]   
-        userEnteredBoardName = board_name
-        currentBoardId = None
-        for board in boards_data:
-            if board.get('name').lower() == userEnteredBoardName:
-                currentBoardId = board.get('id')
-                break   
-        if not currentBoardId:
-            return jsonify({"error": "Board not found"}), 404   
-        # Now fetch pins from the specific board
-        pins_url = f"https://api.pinterest.com/v5/boards/{currentBoardId}/pins/"
-        pins_response = requests.get(pins_url, headers=headers)
-        pins_response.raise_for_status()
-        pins_data = pins_response.json().get('items', []) # Assuming 'items' contains pins      
-        pin_urls = [pin.get('media', {}).get('images', {}).get('600x', {}).get('url', '') for pin in pins_data if pin.get('media')]
-        print(f"Extracted {len(pin_urls)} pin image URLs") # For debugging
+        pin_urls = get_board_image_urls(board_name) if board_name else get_latest_image_urls(pin_size)
         # get recommendations based on pin URLs
         recommendations = await getRecommendations(pin_urls[:5])
         session['recommendations_generated'] = recommendationsGenerated + 1

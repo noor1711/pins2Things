@@ -26,7 +26,7 @@ const recommendationToCardItemMapper = (recommendations) => {
 export default function PinterestRecommender() {
   const [activeTab, setActiveTab] = useState("board"); // "board" or "pins"
   const [boardName, setBoardName] = useState("");
-  const [pinCount, setPinCount] = useState("25");
+  const [pinCount, setPinCount] = useState("5");
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
   const [error, setError] = useState(null);
@@ -44,7 +44,11 @@ export default function PinterestRecommender() {
   const fetchRecommendations = async () => {
     try {
       setIsLoading(true);
-      const recommendations = await getRecommendations(boardName); // Replace with actual board
+      const recommendations = await getRecommendations({
+        boardName,
+        pinCount,
+        activeTab,
+      });
       setRecommendations(recommendationToCardItemMapper(recommendations));
       console.log("Fetched recommendations:", recommendations);
     } catch (error) {
@@ -202,11 +206,9 @@ export default function PinterestRecommender() {
                       className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-200 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
                       disabled={isLoading}
                     >
+                      <option value="5">5 pins</option>
                       <option value="10">10 pins</option>
                       <option value="25">25 pins</option>
-                      <option value="50">50 pins</option>
-                      <option value="100">100 pins</option>
-                      <option value="200">200 pins</option>
                     </select>
                     <p className="text-xs text-gray-500 mt-2">
                       We'll analyze your most recent pins across all boards to
@@ -275,7 +277,7 @@ export default function PinterestRecommender() {
 
       <ConsentModal
         isOpen={showConsentModal}
-        onClose={() => setShowConsentModal(false)}
+        onClose={handleConsentClose}
         onConsent={handleConsent}
         boardName={boardName}
       />

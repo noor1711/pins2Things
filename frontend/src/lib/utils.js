@@ -5,13 +5,20 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export const getRecommendations = async (input) => {
+export const getRecommendations = async ({
+  boardName,
+  pinCount,
+  activeTab,
+}) => {
   // This function fetches recommendations from the backend API
   try {
+    const params =
+      activeTab === "board"
+        ? `board=${encodeURIComponent(boardName)}`
+        : `pin_size=${encodeURIComponent(pinCount)}`;
+
     const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_RECOMMENDATIONS_URL
-      }?board=${encodeURIComponent(input)}`,
+      `${process.env.NEXT_PUBLIC_RECOMMENDATIONS_URL}?${params}`,
       { credentials: "include" }
     );
     if (!response.ok) {
