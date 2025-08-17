@@ -87,7 +87,7 @@ async def analyze_images_with_gemini(images):
     if not len(images):
         return {"keywords": [], "search_query": ""}
     prompt = """
-    Analyze the aesthetic of these images. Identify key objects, color palette, and general mood.
+    You are a style consultant analyzing a collection of images for a client. Your goal is to synthesize a single, cohesive style profile. Analyze the aesthetic of this image. Identify key objects, color palette, and general mood.
     Generate 3-5 concise, comma-separated keywords representing the core aesthetic and any prominent product types.
     Also, provide a single, broad Google Search query (e.g., 'minimalist home decor products') that captures the overall style for finding related products.
     Format your response strictly as JSON:
@@ -123,7 +123,7 @@ async def analyze_image_with_gemini(image):
     if not image:
         return {"keywords": [], "search_query": ""}
     prompt = """
-    Analyze the aesthetic of this image. Identify key objects, color palette, and general mood.
+    You are a style consultant analyzing a collection of images for a client. Your goal is to synthesize a single, cohesive style profile. Analyze the aesthetic of this image. Identify key objects, color palette, and general mood.
     Generate 3-5 concise, comma-separated keywords representing the core aesthetic and any prominent product types.
     Also, provide a single, broad Google Search query (e.g., 'minimalist home decor products') that captures the overall style for finding related products.
     Format your response strictly as JSON:
@@ -162,6 +162,8 @@ def perform_google_cse_search(query):
     params = {
         "key": GOOGLE_CSE_API_KEY,
         "cx": GOOGLE_CSE_ID,
+        "cr": "countryIN",
+        "gl": "IN",
         "q": query,
         "num": 5,
     }
@@ -199,7 +201,7 @@ async def getRecommendations(pin_image_urls):
     #         coro=analyze_image_with_gemini(image)
     #     )    
     #     tasks.append(task)
-    
+     
     # results = await asyncio.gather(*tasks)
 
     results = [await analyze_images_with_gemini(validImages)]
@@ -215,7 +217,7 @@ async def getRecommendations(pin_image_urls):
          final_search_query = " ".join(final_keywords)
 
     if len(final_search_query):
-        final_search_query = final_search_query + " buy -reviews -news -site:reddit.com -site:pinterest.com"
+        final_search_query = final_search_query + " buy now -review -list -article -blog -site:reddit.com -site:pinterest.com"
 
     print(f"Final Search Query: {final_search_query}")
     if final_search_query:
