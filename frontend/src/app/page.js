@@ -182,7 +182,7 @@ export default function PinterestRecommender() {
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      We'll analyze all pins from this specific board to
+                      We will analyze all pins from this specific board to
                       understand your aesthetic.
                     </p>
                   </div>
@@ -211,7 +211,7 @@ export default function PinterestRecommender() {
                       <option value="25">25 pins</option>
                     </select>
                     <p className="text-xs text-gray-500 mt-2">
-                      We'll analyze your most recent pins across all boards to
+                      We will analyze your most recent pins across all boards to
                       understand your current aesthetic preferences.
                     </p>
                   </div>
