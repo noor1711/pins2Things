@@ -95,31 +95,20 @@ export default function PinterestRecommender() {
   };
 
   return (
-    <div className="min-h-screen relative bg-black text-white">
-      {/* Neon ambient glows */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.22]">
-        <div className="absolute -top-10 -left-10 w-60 h-60 bg-emerald-500 rounded-full blur-3xl" />
-        <div className="absolute top-40 right-10 w-52 h-52 bg-lime-400 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-1/3 w-56 h-56 bg-amber-400 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen relative bg-cream text-white">
       <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
         <header className="mb-10 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 bg-neutral-900 border border-neutral-800 text-neutral-300 mb-3">
-            <Sparkles className="w-4 h-4 text-lime-400" />
-            <span className="text-xs font-medium">Aesthetic matcher</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-emerald-500 via-lime-400 to-amber-400 bg-clip-text text-transparent">
-            Pinterest Aesthetic Recommender
+          <h1 className="text-3xl font-extrabold font-raleway md:text-7xl bg-gradient-to-r from-orange-500 via-red-400 to-red-400 bg-clip-text text-transparent">
+            pins2Things
           </h1>
-          <p className="text-neutral-300 mt-3">
+          <p className="text-neutral-900 mt-3">
             Paste a board name and we&apos;ll find products that match your
             vibe.
           </p>
         </header>
 
-        <Card className="border border-neutral-800 bg-neutral-950 rounded-2xl">
+        <Card className="border-3 border-neutral-800 overflow-hidden bg-cream">
           {/* Tab Navigation */}
           <div className="flex border-b border-neutral-800">
             <button
@@ -146,7 +135,7 @@ export default function PinterestRecommender() {
             </button>
           </div>
 
-          <CardContent className="p-6 md:p-8">
+          <CardContent className="p-6 md:p-8 bg-white">
             <form onSubmit={handleFormSubmit} noValidate>
               {/* Board Tab Content */}
               {activeTab === "board" && (
@@ -168,7 +157,7 @@ export default function PinterestRecommender() {
                         placeholder="Enter Pinterest board name"
                         value={boardName}
                         onChange={(e) => setBoardName(e.target.value)}
-                        className="pl-9 bg-neutral-950 text-neutral-100 placeholder-neutral-500 border-neutral-800 focus:border-emerald-400 focus-visible:ring-emerald-500/30 focus-visible:ring-4"
+                        className="pl-9 h-10 text-neutral-900 placeholder-neutral-500 border-neutral-800 focus:border-green-800 focus-visible:ring-green-800/30 focus-visible:ring-4"
                         aria-invalid={!!error}
                         aria-describedby={error ? "board-error" : undefined}
                         disabled={isLoading}
@@ -203,7 +192,7 @@ export default function PinterestRecommender() {
                       id="pinCount"
                       value={pinCount}
                       onChange={(e) => setPinCount(e.target.value)}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-200 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
+                      className="w-full px-3 py-2 h-10 bg-white text-gray-900 border border-neutral-800 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
                       disabled={isLoading}
                     >
                       <option value="5">5 pins</option>
@@ -221,7 +210,7 @@ export default function PinterestRecommender() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full text-white bg-gradient-to-r from-[#A8DCAB] via-[#519755] to-[#DBAAA7] hover:opacity-90 shadow-md py-3 mt-6"
+                className="w-full text-white bg-gradient-to-r from-green-800 via-green-600 to-green-800 hover:opacity-90 shadow-md py-3 mt-6"
                 disabled={
                   (activeTab === "board" && !boardName.trim()) || isLoading
                 }
@@ -241,7 +230,7 @@ export default function PinterestRecommender() {
                 ) : (
                   <p className="text-xs text-gray-500">
                     {activeTab === "board"
-                      ? 'Tip: Press "/" to focus the board field. We\'ll ask permission before accessing your board.'
+                      ? "We'll ask permission before accessing your board."
                       : "We'll ask permission before accessing your recent pins."}
                   </p>
                 )}

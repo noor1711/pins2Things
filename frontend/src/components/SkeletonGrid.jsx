@@ -12,13 +12,13 @@ const SkeletonGrid = ({ message = "Loading recommendations..." }) => {
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div
             key={i}
-            className="border border-neutral-800 rounded-xl overflow-hidden bg-neutral-950"
+            className="border border-2 border-neutral-800 rounded-xl overflow-hidden bg-cream"
           >
-            <div className="w-full h-48 bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 bg-[length:200%_100%] animate-shimmer" />
+            <div className="w-full h-48 bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
             <div className="p-4 space-y-3">
-              <div className="h-5 rounded w-3/4 bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 bg-[length:200%_100%] animate-shimmer" />
-              <div className="h-4 rounded w-1/2 bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 bg-[length:200%_100%] animate-shimmer" />
-              <div className="h-10 rounded bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 bg-[length:200%_100%] animate-shimmer" />
+              <div className="h-5 rounded w-3/4 bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
+              <div className="h-4 rounded w-1/2 bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
+              <div className="h-10 rounded bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 bg-[length:200%_100%] animate-shimmer" />
             </div>
           </div>
         ))}

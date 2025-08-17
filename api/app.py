@@ -15,6 +15,7 @@ import json
 import logging
 import requests
 import asyncio
+from google.generativeai import types
 
 ERRORS = {
     "TOO_MANY_REQUESTS": {
@@ -99,7 +100,9 @@ async def analyze_images_with_gemini(images):
     try:
         logging.info("Requesting gemini content generation at", datetime.now())
         await asyncio.sleep(random())
-        response = gemini_model.generate_content([prompt, *images])
+        response = gemini_model.generate_content([prompt, *images], generation_config=types.GenerationConfig(
+        temperature=0.0,  # Set temperature to 0
+    ))
         response_text = response.text.strip()
         try:
             result = json.loads(response_text)
@@ -135,7 +138,9 @@ async def analyze_image_with_gemini(image):
     try:
         await asyncio.sleep(random())
         logging.info("Requesting gemini content generation at", datetime.now())
-        response = gemini_model.generate_content([prompt, image])
+        response = gemini_model.generate_content([prompt, image],  generation_config=types.GenerationConfig(
+        temperature=0.0,  # Set temperature to 0
+    ))
         response_text = response.text.strip()
         try:
             result = json.loads(response_text)
