@@ -160,6 +160,33 @@ async def analyze_image_with_gemini(image):
         logging.error(f"Error analyzing image with Gemini: {e}")
         return {"keywords": [], "search_query": ""}
 
+import re
+
+def is_shopping_site_fast(result_item):
+    """
+    Analyzes a Google CSE search result to determine if it's an e-commerce page
+    without fetching the page content.
+
+    Args:
+        result_item (dict): A single dictionary item from the CSE API response.
+                          It must contain 'link', 'title', and 'snippet' keys.
+
+    Returns:
+        bool: True if the site is likely a shopping site, False otherwise.
+    """
+    blog_patterns = [
+        r'/blog', r'/article', r'/post', r'/news', r'/review', r'/list', r'/guide',r'/how-to', r'/tips', r'/tutorial', r'/opinion', r'/op-ed',
+    ]
+    print("THE TYPE OF RESULT_ITEM", type(result_item))
+    for pattern in blog_patterns:
+        if re.search(pattern, result_item.get("link"), re.IGNORECASE):
+            return False
+
+    if re.search(r'article', result_item.get("pagemap", {}).get("metatags", [{}])[0].get("og:type", ""), re.IGNORECASE):
+        return False
+
+    return True
+
 def perform_google_cse_search(query):
     if not query:
         return []
@@ -170,7 +197,7 @@ def perform_google_cse_search(query):
         "cr": "countryIN",
         "gl": "IN",
         "q": query,
-        "num": 5,
+        "num": 10,
     }
     try:
         response = requests.get(search_url, params=params)
@@ -179,12 +206,14 @@ def perform_google_cse_search(query):
         logging.info(f"Google CSE performed for {query}")
         results = []
         for item in data.get("items", []):
-            results.append({
-                "title": item.get("title"),
-                "link": item.get("link"),
-                "thumbnail": item.get("pagemap", {}).get("cse_image", [{}])[0].get("src", "") or item.get("displayLink", ""),
-                "snippet": item.get("snippet", ""),
-            })
+            # print("Items:", item.get("link"), item.get("pagemap"))
+            if is_shopping_site_fast(item):
+                results.append({
+                    "title": item.get("title"),
+                    "link": item.get("link"),
+                    "thumbnail": item.get("pagemap", {}).get("cse_image", [{}])[0].get("src", "") or item.get("displayLink", ""),
+                    "snippet": item.get("snippet", ""),
+                })
         return results
     except Exception as e:
         logging.error(f"Error performing Google CSE search for '{query}': {e}")
