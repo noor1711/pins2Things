@@ -30,7 +30,7 @@ const RecommendationGrid = ({ items }) => {
         {items.map((item) => (
           <Card
             key={item.id}
-            className="border border-2 overflow-hidden border-neutral-800 bg-cream rounded-xl transition-transform duration-200 hover:-translate-y-0.5"
+            className="border border-2 overflow-hidden border-neutral-800 bg-[#f5f1e2] rounded-xl transition-transform duration-200 hover:-translate-y-0.5"
           >
             <CardContent className="p-0">
               <div className="relative overflow-hidden">
@@ -55,7 +55,7 @@ const RecommendationGrid = ({ items }) => {
                   href={item?.link || "#"}
                   className="block"
                 >
-                  <Button className="w-full text-neutral-100 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-800 hover:to-blue-600">
+                  <Button className="w-full text-neutral-100 border-2 border-black bg-green-700 hover:bg-green-600">
                     View
                   </Button>
                 </Link>

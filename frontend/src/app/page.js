@@ -95,7 +95,7 @@ export default function PinterestRecommender() {
   };
 
   return (
-    <div className="min-h-screen relative bg-cream text-white">
+    <div className="min-h-screen relative bg-[#ebe7da] text-white">
       <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
         <header className="mb-10 text-center">
@@ -108,15 +108,15 @@ export default function PinterestRecommender() {
           </p>
         </header>
 
-        <Card className="border-3 border-neutral-800 overflow-hidden bg-cream">
+        <Card className="border-3 border-neutral-800 overflow-hidden ">
           {/* Tab Navigation */}
           <div className="flex border-b border-neutral-800">
             <button
               onClick={() => setActiveTab("board")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
                 activeTab === "board"
-                  ? "text-[#519755] border-b-2 border-[#519755] bg-white"
-                  : "text-gray-500 hover:text-gray-700 bg-gray-50/50"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#f5f1e2]"
+                  : "text-gray-500 hover:text-gray-700 bg-[#d0d0a8]"
               }`}
               disabled={isLoading}
             >
@@ -126,8 +126,8 @@ export default function PinterestRecommender() {
               onClick={() => setActiveTab("pins")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
                 activeTab === "pins"
-                  ? "text-[#519755] border-b-2 border-[#519755] bg-white"
-                  : "text-gray-500 hover:text-gray-700 bg-gray-50/50"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#f5f1e2]"
+                  : "text-gray-500 hover:text-gray-700 bg-[#d0d0a8]"
               }`}
               disabled={isLoading}
             >
@@ -135,7 +135,7 @@ export default function PinterestRecommender() {
             </button>
           </div>
 
-          <CardContent className="p-6 md:p-8 bg-white">
+          <CardContent className="p-6 md:p-8 bg-[#f5f1e2]">
             <form onSubmit={handleFormSubmit} noValidate>
               {/* Board Tab Content */}
               {activeTab === "board" && (
@@ -192,7 +192,7 @@ export default function PinterestRecommender() {
                       id="pinCount"
                       value={pinCount}
                       onChange={(e) => setPinCount(e.target.value)}
-                      className="w-full px-3 py-2 h-10 bg-white text-gray-900 border border-neutral-800 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
+                      className="w-full px-3 py-2 h-10 bg-[#ebe7da] text-gray-900 border border-neutral-800 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
                       disabled={isLoading}
                     >
                       <option value="5">5 pins</option>
@@ -210,7 +210,7 @@ export default function PinterestRecommender() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full text-white bg-gradient-to-r from-green-800 via-green-600 to-green-800 hover:opacity-90 shadow-md py-3 mt-6"
+                className="w-full text-white border-2 border-black bg-green-700 hover:bg-green-600 shadow-md py-3 mt-6"
                 disabled={
                   (activeTab === "board" && !boardName.trim()) || isLoading
                 }
