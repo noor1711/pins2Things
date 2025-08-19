@@ -177,7 +177,7 @@ def is_shopping_site_fast(result_item):
     blog_patterns = [
         r'/blog', r'/article', r'/post', r'/news', r'/review', r'/list', r'/guide',r'/how-to', r'/tips', r'/tutorial', r'/opinion', r'/op-ed',
     ]
-    print("THE TYPE OF RESULT_ITEM", type(result_item))
+    print("Website link:", result_item.get("link"))
     for pattern in blog_patterns:
         if re.search(pattern, result_item.get("link"), re.IGNORECASE):
             return False
@@ -194,7 +194,6 @@ def perform_google_cse_search(query):
     params = {
         "key": GOOGLE_CSE_API_KEY,
         "cx": GOOGLE_CSE_ID,
-        "cr": "countryIN",
         "gl": "IN",
         "q": query,
         "num": 10,

@@ -29,7 +29,7 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-cream backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="consent-title"
@@ -37,8 +37,8 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
         if (e.target === overlayRef.current) onClose?.();
       }}
     >
-      <Card className="w-full max-w-md bg-neutral-100 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="p-5 bg-gradient-to-r from-orange-500 via-orange-400 to-red-400 text-black">
+      <Card className="w-full max-w-md bg-[#f5f1e2] border-2 border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="p-5 bg-[#ebe7da] text-black">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
             <h2 id="consent-title" className="text-lg font-semibold">
@@ -72,7 +72,7 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
             </ul>
           </div>
 
-          <div className="rounded-lg border border-neutral-700 bg-blue-800 p-4">
+          <div className="rounded-lg border-2 border-neutral-700 bg-blue-800/60 p-4">
             <div className="flex items-center gap-2 mb-1">
               <Lock className="w-4 h-4 text-emerald-400" />
               <span className="text-sm font-semibold text-white">
@@ -89,14 +89,14 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
             <Button
               variant="outline"
               onClick={onClose}
-              className="min-w-[96px] border-neutral-700 text-neutral-800"
+              className="min-w-[96px] border-2 border-neutral-700 text-neutral-800"
             >
               Cancel
             </Button>
             <Button
               onClick={onConsent}
               ref={allowRef}
-              className="min-w-[160px] text-black bg-gradient-to-r from-green-800 to-green-600 hover:from-green-600 hover:to-green-800 text-neutral-100"
+              className="min-w-[160px] border-2 border-black text-black bg-green-700 hover:bg-green-600 shadow-md text-neutral-100"
             >
               Allow and continue
             </Button>
