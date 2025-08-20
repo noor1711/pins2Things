@@ -1,21 +1,34 @@
 "use client"; // auth context needs to be fetched and stored client-side
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const router = useRouter(); // Hook to programmatically navigate users
 
   const authenticateUser = async (board) => {
     try {
-      router.push(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}?board=${encodeURIComponent(
-          board
-        )}`
-      );
+      if (!!board) {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_BOARD_URL}?board=${encodeURIComponent(
+            board
+          )}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+      }
+      const CLIENT_ID = `${process.env.NEXT_PUBLIC_PINTEREST_CLIENT_ID}`;
+      const REDIRECT_URI = `${process.env.NEXT_PUBLIC_PINTEREST_REDIRECT_URI}`;
+      const SCOPES = "boards:read,pins:read,user_accounts:read";
+      const AUTH_URL = "https://pinterest.com/oauth/";
+
+      const authUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
+
+      // Navigate the user's browser to the URL, which will trigger the app link
+      window.location.href = authUrl;
     } catch (error) {
       console.error("Error during authentication:", error);
     }

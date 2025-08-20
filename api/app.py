@@ -334,23 +334,30 @@ def user_status():
         return jsonify({"isAuthenticated": False, "message": "Not authenticated with Pinterest"})
 
 # --- Backend Endpoint to Initiate OAuth ---
-@app.route('/api/pinterest-auth-start')
-def pinterest_auth_start():
-    # For reading pins and boards: 'boards:read', 'pins:read', 'user_accounts:read'
-    SCOPES = "boards:read,pins:read,user_accounts:read" # Comma-separated
+# @app.route('/api/pinterest-auth-start')
+# def pinterest_auth_start():
+#     # For reading pins and boards: 'boards:read', 'pins:read', 'user_accounts:read'
+#     SCOPES = "boards:read,pins:read,user_accounts:read" # Comma-separated
+#     boardName = request.args.get('board')
+#     session['boardName'] = boardName
+    
+#     auth_url = (
+#         f"{PINTEREST_AUTHORIZE_URL}?"
+#         f"client_id={PINTEREST_CLIENT_ID}&"
+#         f"redirect_uri={PINTEREST_REDIRECT_URI}&"
+#         f"response_type=code&"
+#         f"scope={SCOPES}"
+#     )
+
+#     logging.info("Starting Oauth flow: Redirecting to Pinterest OAuth URL")
+#     return redirect(auth_url)
+
+@app.route('/api/set-board')
+def set_board():   
     boardName = request.args.get('board')
     session['boardName'] = boardName
-    
-    auth_url = (
-        f"{PINTEREST_AUTHORIZE_URL}?"
-        f"client_id={PINTEREST_CLIENT_ID}&"
-        f"redirect_uri={PINTEREST_REDIRECT_URI}&"
-        f"response_type=code&"
-        f"scope={SCOPES}"
-    )
-
-    logging.info("Starting Oauth flow: Redirecting to Pinterest OAuth URL")
-    return redirect(auth_url)
+    print(f"Board name set in session: {boardName}") # For debugging
+    return jsonify({"message": "Board name set successfully."})
 
 @app.route('/api/pinterest-callback')
 def pinterest_callback():
@@ -400,10 +407,10 @@ def pinterest_callback():
         session['pinterest_refresh_token'] = token_data.get('refresh_token') # Store refresh token if available
         session['pinterest_access_token_expiry'] = (datetime.now() + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat() # Store expiry time
         session['pinterest_refresh_token_expiry'] = (datetime.now() + timedelta(seconds=token_data.get('refresh_token_expires_in', 3600))).isoformat() # Store refresh token expiry time
-        boardName = request.args.get('board')
         boardName = session.get('boardName')
-        
-        return redirect(f"{FRONTEND_HOME_URL}/?board={boardName}")
+        if boardName:
+            return redirect(f"{FRONTEND_HOME_URL}/?board={boardName}")
+        return redirect(f"{FRONTEND_HOME_URL}")
 
     except requests.exceptions.HTTPError as e:
         print(f"HTTP Error during token exchange: {e.response.status_code} - {e.response.text}")
