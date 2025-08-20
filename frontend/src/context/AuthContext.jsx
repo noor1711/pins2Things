@@ -26,9 +26,14 @@ export const AuthProvider = ({ children }) => {
       const AUTH_URL = "https://pinterest.com/oauth/";
 
       const webAuthUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
-      // const deepLinkUri = `pinterest://oauth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
+      const deepLinkUri = `pinterest://${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPES}`;
 
-      window.location.href = webAuthUrl;
+      window.location.href = deepLinkUri;
+      // Set a timeout. If the app opens, this timeout will be cleared.
+      // If the app doesn't open, the browser will redirect to the web URL.
+      setTimeout(function () {
+        window.location.href = webAuthUrl;
+      }, 500); // 500ms is a good balance for this check
     } catch (error) {
       console.error("Error during authentication:", error);
     }
