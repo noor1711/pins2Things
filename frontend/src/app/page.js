@@ -13,6 +13,7 @@ import RecommendationGrid from "@/components/RecommendationsGrid";
 import { useAuth } from "@/context/AuthContext";
 import ConsentModal from "@/components/ConsentModal";
 import { useSearchParams } from "next/navigation";
+import { Header } from "@/components/header";
 
 const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
@@ -99,9 +100,7 @@ export default function PinterestRecommender() {
       <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
         <header className="mb-10 text-center">
-          <h1 className="text-3xl font-extrabold font-raleway md:text-7xl bg-gradient-to-r from-orange-500 via-red-400 to-red-400 bg-clip-text text-transparent">
-            pins2Things
-          </h1>
+          <Header />
           <p className="text-neutral-900 mt-3">
             Paste a board name and we&apos;ll find products that match your
             vibe.
