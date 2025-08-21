@@ -7,8 +7,8 @@ export const Header = () => {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="720"
-        height="150"
-        viewBox="0 0 720 150"
+        height="130"
+        viewBox="0 0 720 130"
       >
         <text x="450" y="100" className="colorText">
           pins2Things

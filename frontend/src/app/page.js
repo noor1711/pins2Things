@@ -13,7 +13,7 @@ import RecommendationGrid from "@/components/RecommendationsGrid";
 import { useAuth } from "@/context/AuthContext";
 import ConsentModal from "@/components/ConsentModal";
 import { useSearchParams } from "next/navigation";
-import { Header } from "@/components/header";
+import { Header } from "@/components/Header";
 
 const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
