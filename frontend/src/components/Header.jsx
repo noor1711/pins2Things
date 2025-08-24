@@ -3,33 +3,16 @@ import React from "react";
 
 export const Header = () => {
   return (
-    <>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="720"
-        height="130"
-        viewBox="0 0 720 130"
-      >
-        <text x="450" y="100" className="colorText">
-          pins2Things
-        </text>
-      </svg>
-      <style jsx>
-        {`
-          .colorText {
-            stroke-width: 6px;
-            paint-order: stroke;
-          }
-          text {
-            font: 100px bold sans-serif;
-            font-weight: 900;
-            stroke-linejoin: round;
-            text-anchor: middle;
-            fill: #f97316;
-            stroke: black;
-          }
-        `}
-      </style>
-    </>
+    <div className="flex flex-row items-center justify-center hover:text-[#f03a91aa]">
+      <h1 className="text-8xl font-bold text-[#f03a91e8] drop-shadow-lg font-dynapuff ">
+        Pins
+      </h1>
+      <h1 className="text-9xl font-bold text-[#f03a91e8] drop-shadow-lg font-dynapuff ">
+        2
+      </h1>
+      <h1 className="text-8xl font-bold text-[#f03a91e8] drop-shadow-lg font-dynapuff ">
+        Things
+      </h1>
+    </div>
   );
 };

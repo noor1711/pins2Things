@@ -1,4 +1,10 @@
-import { Geist, Geist_Mono, Pixelify_Sans, Raleway } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Pixelify_Sans,
+  Raleway,
+  DynaPuff,
+} from "next/font/google";
 import { Suspense } from "react";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -24,6 +30,12 @@ const pixelifySans = Pixelify_Sans({
   weight: ["400", "700"],
 });
 
+const dynaPuff = DynaPuff({
+  variable: "--font-dynapuff",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
 export const metadata = {
   title: "Pins2Things",
   description: "From Pins to Products",
@@ -36,7 +48,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/x-icon" href="/pins2things.ico" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${raleway.variable} ${pixelifySans.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} ${raleway.variable} ${pixelifySans.variable} ${dynaPuff.variable}`}
       >
         <AuthProvider>
           <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>

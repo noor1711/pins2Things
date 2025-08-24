@@ -41,6 +41,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-raleway: var(--font-raleway);
   --font-pixelify: var(--font-pixelify-sans);
+  --font-dynapuff: var(--font-dynapuff);
 }
 
 :root {

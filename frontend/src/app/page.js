@@ -14,6 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 import ConsentModal from "@/components/ConsentModal";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
+import Image from "next/image";
 
 const recommendationToCardItemMapper = (recommendations) => {
   return recommendations?.recommendations?.map((item, index) => ({
@@ -97,6 +98,24 @@ export default function PinterestRecommender() {
 
   return (
     <div className="min-h-screen relative bg-[#ebe7da] text-white">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <Image
+          src="/bowPix.png"
+          alt="Pixel Bow"
+          width={60}
+          height={40}
+          priority
+          className="absolute top-25 left-1/5 opacity-90 w-12 h-8 sm:w-16 sm:h-10"
+        />
+        <Image
+          src="/bowIcecream.png"
+          alt="Pixel Flower"
+          width={60}
+          height={40}
+          priority
+          className="absolute top-60 sm:top-80 right-2 sm:right-10 opacity-40 w-12 h-8 sm:w-16 sm:h-10"
+        />
+      </div>
       <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
         <header className="mb-10 text-center">
