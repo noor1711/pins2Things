@@ -4,6 +4,7 @@ import {
   Pixelify_Sans,
   Raleway,
   DynaPuff,
+  Sour_Gummy,
 } from "next/font/google";
 import { Suspense } from "react";
 import { AuthProvider } from "@/context/AuthContext";
@@ -36,6 +37,12 @@ const dynaPuff = DynaPuff({
   weight: ["400", "700"],
 });
 
+const sourGummy = Sour_Gummy({
+  variable: "--font-sour-gummy",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
 export const metadata = {
   title: "Pins2Things",
   description: "From Pins to Products",
@@ -48,7 +55,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/x-icon" href="/pins2things.ico" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${raleway.variable} ${pixelifySans.variable} ${dynaPuff.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} ${raleway.variable} ${pixelifySans.variable} ${dynaPuff.variable} ${sourGummy.variable}`}
       >
         <AuthProvider>
           <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>

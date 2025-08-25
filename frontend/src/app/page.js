@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Zap, Eye, Sparkles, Palette } from "lucide-react";
+import { Search, Zap, Eye, Sparkles, Palette, Heart } from "lucide-react";
 import "./globals.css"; // Import global styles
 import { getRecommendations } from "@/lib/utils";
 import ErrorMessage from "@/components/ErrorMessage";
@@ -97,8 +97,8 @@ export default function PinterestRecommender() {
   };
 
   return (
-    <div className="min-h-screen relative bg-[#ebe7da] text-white">
-      <div className="fixed inset-0 pointer-events-none z-0">
+    <div className="min-h-screen relative bg-[#fdf6df] text-white">
+      {/* <div className="fixed inset-0 pointer-events-none z-0">
         <Image
           src="/bowPix.png"
           alt="Pixel Bow"
@@ -115,6 +115,9 @@ export default function PinterestRecommender() {
           priority
           className="absolute top-60 sm:top-80 right-2 sm:right-10 opacity-40 w-12 h-8 sm:w-16 sm:h-10"
         />
+      </div> */}
+      <div className="text-[#ff5fac] text-2xl flex flex-row justify-end font-sourgummy p-2 items-center">
+        For the Girlies. <Heart />
       </div>
       <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
@@ -133,7 +136,7 @@ export default function PinterestRecommender() {
               onClick={() => setActiveTab("board")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
                 activeTab === "board"
-                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#f5f1e2]"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#fffbec]"
                   : "text-gray-500 hover:text-gray-700 bg-[#d0d0a8]"
               }`}
               disabled={isLoading}
@@ -144,7 +147,7 @@ export default function PinterestRecommender() {
               onClick={() => setActiveTab("pins")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
                 activeTab === "pins"
-                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#f5f1e2]"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#fffbec]"
                   : "text-gray-500 hover:text-gray-700 bg-[#d0d0a8]"
               }`}
               disabled={isLoading}
@@ -153,7 +156,7 @@ export default function PinterestRecommender() {
             </button>
           </div>
 
-          <CardContent className="p-6 md:p-8 bg-[#f5f1e2]">
+          <CardContent className="p-6 md:p-8 bg-[#fffbec]">
             <form onSubmit={handleFormSubmit} noValidate>
               {/* Board Tab Content */}
               {activeTab === "board" && (
@@ -275,7 +278,7 @@ export default function PinterestRecommender() {
         <footer className="mt-12 pt-6 border-t border-neutral-800 text-center">
           <a
             href="/privacy-policy"
-            className="text-sm text-neutral-400 hover:text-neutral-200 underline underline-offset-4"
+            className="text-md text-pink-400 hover:text-pink-500 underline underline-offset-4"
           >
             Privacy policy
           </a>
