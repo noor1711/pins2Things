@@ -18,7 +18,7 @@ const RecommendationGrid = ({ items }) => {
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-6" aria-live="polite">
       <div className="mb-6">
-        <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-emerald-500 via-lime-400 to-amber-400 bg-clip-text text-transparent">
+        <h2 className="text-xl md:text-2xl font-bold text-emerald-700">
           Recommendations
         </h2>
         <p className="text-sm text-neutral-400">
@@ -30,7 +30,7 @@ const RecommendationGrid = ({ items }) => {
         {items.map((item) => (
           <Card
             key={item.id}
-            className="border border-2 overflow-hidden border-neutral-800 bg-[#f5f1e2] rounded-xl transition-transform duration-200 hover:-translate-y-0.5"
+            className="border border-2 overflow-hidden shadow-2xl border-neutral-800 bg-[#f5f1e2] rounded-xl transition-transform duration-200 hover:-translate-y-0.5"
           >
             <CardContent className="p-0">
               <div className="relative overflow-hidden">

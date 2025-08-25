@@ -213,7 +213,7 @@ export default function PinterestRecommender() {
                       id="pinCount"
                       value={pinCount}
                       onChange={(e) => setPinCount(e.target.value)}
-                      className="w-full px-3 py-2 h-10 bg-[#ebe7da] text-gray-900 border border-neutral-800 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
+                      className="w-full px-3 py-2 h-10 bg-[#fffbec] text-gray-900 border border-neutral-800 rounded-md focus:border-[#519755] focus:ring-[#519755]/30 focus:ring-4 focus:outline-none disabled:opacity-50"
                       disabled={isLoading}
                     >
                       <option value="5">5 pins</option>
