@@ -128,7 +128,7 @@ export default function PinterestRecommender() {
       <div className="text-[#ff5fac] text-2xl flex flex-row justify-end font-sourgummy p-2 items-center">
         For the Girlies. <Heart />
       </div>
-      <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
+      <div className="container mx-auto px-4 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
         <header className="mb-10 text-center">
           <div className="flex flex-1 justify-center">
