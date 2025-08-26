@@ -1,19 +1,27 @@
 "use client";
 import React from "react";
-import { Pacifico } from "next/font/google";
-
-// Load the Pacifico font using Next.js font optimization
-const pacifico = Pacifico({
-  subsets: ["latin"],
-  weight: "400", // Ensure this weight is available and loaded
-});
 
 export const Header = () => {
   return (
-    <div
-      className={`flex font-bold drop-shadow-5xl text-5xl lg:text-8xl md:text-6xl sm:text-5xl flex-row items-center justify-center text-[#f03a91e8] hover:text-[#fa0279] text-shadow-lg/50 text-shadow-neutral-500 transition-transform duration-200 hover:-translate-y-0.5 ${pacifico.className}`}
-    >
+    <div className="text-with-image-background flex-row items-center justify-center transition-transform duration-200 hover:-translate-y-0.5 font-sourgummy">
       <h1>Pins2Things</h1>
+      <style jsx>
+        {`
+          .text-with-image-background {
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            font-size: 6em;
+            background-image: linear-gradient(
+              45deg,
+              #00a36c,
+              #5fbc8b,
+              #a2d5ab,
+              #00a36c
+            );
+          }
+        `}
+      </style>
     </div>
   );
 };
