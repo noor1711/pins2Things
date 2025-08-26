@@ -95,9 +95,18 @@ export default function PinterestRecommender() {
   const handleConsentClose = () => {
     setShowConsentModal(false);
   };
-
+  const colorScheme = {
+    primary: "#FCE4EC",
+    secondary: "#E91E63",
+    accent: "#E8F5E9",
+    background: "#FAF9F6",
+    softPink: "#F8BBDE",
+    lightLavender: "#D1C4E9",
+    darkerAccent: "#B39DDB",
+    softYellow: "#FFB3A6",
+  };
   return (
-    <div className="min-h-screen relative bg-[#fdf6df] text-white">
+    <div className="min-h-screen relative bg-[#fffff2] text-white">
       {/* <div className="fixed inset-0 pointer-events-none z-0">
         <Image
           src="/bowPix.png"
@@ -124,8 +133,7 @@ export default function PinterestRecommender() {
         <header className="mb-10 text-center">
           <Header />
           <p className="text-neutral-900 mt-3">
-            Paste a board name and we&apos;ll find products that match your
-            vibe.
+            Find products that match your vibe.
           </p>
         </header>
 
@@ -134,9 +142,9 @@ export default function PinterestRecommender() {
           <div className="flex border-b border-neutral-800">
             <button
               onClick={() => setActiveTab("board")}
-              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
+              className={`flex flex-1 flex-row justify-center px-6 py-4 text-sm font-medium transition-colors duration-200 ${
                 activeTab === "board"
-                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#fffbec]"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#E8F5E9]"
                   : "text-gray-500 hover:text-gray-700 bg-[#d0d0a8]"
               }`}
               disabled={isLoading}
@@ -147,7 +155,7 @@ export default function PinterestRecommender() {
               onClick={() => setActiveTab("pins")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors duration-200 ${
                 activeTab === "pins"
-                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#fffbec]"
+                  ? "text-[#519755] border-b-2 border-[#519755] bg-[#E8F5E9]"
                   : "text-gray-500 hover:text-gray-700 bg-[#d0d0a8]"
               }`}
               disabled={isLoading}
@@ -231,7 +239,7 @@ export default function PinterestRecommender() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full text-white border-2 border-black bg-green-700 hover:bg-green-600 shadow-md py-3 mt-6"
+                className="w-full text-black border-2 border-black bg-[#F8BBDEdd] hover:bg-[#F8BBDE] shadow-md py-3 mt-6"
                 disabled={
                   (activeTab === "board" && !boardName.trim()) || isLoading
                 }
@@ -241,6 +249,7 @@ export default function PinterestRecommender() {
                   : activeTab === "board"
                   ? "Analyze Board"
                   : "Analyze Recent Pins"}
+                <Heart className="w-4 h-4 ml-2 inline-block" />
               </Button>
 
               <div className="mt-4 min-h-[1.25rem]">
