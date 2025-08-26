@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
       window.location.href = webAuthUrl;
     } catch (error) {
-      console.error("Error during authentication:", error);
+      console.error("Error during pinterest authentication:", error);
     }
   };
 
