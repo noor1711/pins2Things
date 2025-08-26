@@ -20,6 +20,11 @@ export const Header = () => {
               #00a36c
             );
           }
+          @media (max-width: 768px) {
+            .text-with-image-background {
+              font-size: 4em;
+            }
+          }
         `}
       </style>
     </div>

@@ -131,7 +131,18 @@ export default function PinterestRecommender() {
       <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
         <header className="mb-10 text-center">
-          <Header />
+          <div className="flex flex-1 justify-center">
+            <Header />
+            <Image
+              src="/cutePin.png"
+              alt="Description of image"
+              width={80}
+              height={80}
+              priority
+              className="mt-4"
+            />
+          </div>
+
           <p className="text-neutral-900 mt-3">
             Find products that match your vibe.
           </p>
