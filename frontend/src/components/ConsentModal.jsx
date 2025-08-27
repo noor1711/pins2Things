@@ -38,7 +38,7 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
       }}
     >
       <Card className="w-full max-w-md bg-[#f5f1e2] border-2 border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="p-5 bg-[#ebe7da] text-black">
+        <div className="p-5 consent-header text-black">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
             <h2 id="consent-title" className="text-lg font-semibold">
@@ -51,7 +51,7 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
         </div>
 
         <CardContent className="p-6 space-y-6">
-          <div className="space-y-3">
+          <div className="gap-3">
             <h3 className="font-medium text-neutral-800 flex items-center gap-2">
               <Eye className="w-4 h-4 text-neutral-800" />
               What we access
@@ -72,14 +72,12 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
             </ul>
           </div>
 
-          <div className="rounded-lg border-2 border-neutral-700 bg-blue-800/60 p-4">
+          <div className="rounded-lg border-2 bg-[#c4d8f3] border-2 border-[#4c90ea] my-5 p-4 text-gray-700">
             <div className="flex items-center gap-2 mb-1">
-              <Lock className="w-4 h-4 text-emerald-400" />
-              <span className="text-sm font-semibold text-white">
-                Privacy promise
-              </span>
+              <Lock className="w-4 h-4 " />
+              <span className="text-sm font-semibold">Privacy promise</span>
             </div>
-            <p className="text-sm text-neutral-100">
+            <p className="text-sm ">
               Your data is used only for this analysis. We do not permanently
               store personal information.
             </p>
@@ -96,13 +94,20 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
             <Button
               onClick={onConsent}
               ref={allowRef}
-              className="min-w-[160px] border-2 border-black text-black bg-green-700 hover:bg-green-600 shadow-md text-neutral-100"
+              className="min-w-[160px] border-2 border-black shadow-md text-[#519755] border-b-2 border-[#519755] bg-[#E8F5E9]"
             >
               Allow and continue
             </Button>
           </div>
         </CardContent>
       </Card>
+      <style jsx>
+        {`
+          .consent-header {
+            background-color: #b39ddb;
+          }
+        `}
+      </style>
     </div>
   );
 };

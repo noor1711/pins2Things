@@ -55,7 +55,7 @@ const RecommendationGrid = ({ items }) => {
                   href={item?.link || "#"}
                   className="block"
                 >
-                  <Button className="w-full text-neutral-100 border-2 border-black bg-green-700 hover:bg-green-600">
+                  <Button className="w-full text-neutral-100 border-2 border-black bg-emerald-700 hover:bg-emerald-600">
                     View
                   </Button>
                 </Link>

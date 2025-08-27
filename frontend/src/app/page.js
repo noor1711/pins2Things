@@ -104,6 +104,11 @@ export default function PinterestRecommender() {
     lightLavender: "#D1C4E9",
     darkerAccent: "#B39DDB",
     softYellow: "#FFB3A6",
+    paleBlue: "#C0E9EF",
+    beauBlue: "#c4d8f3ff",
+    soap: "#C8C7F7",
+    mauve: "#CCB5FB",
+    paleViolet: "#D0A4FF",
   };
   return (
     <div className="min-h-screen relative bg-[#fffff2] text-white">
