@@ -22,7 +22,7 @@ export const Header = () => {
           }
           @media (max-width: 768px) {
             .text-with-image-background {
-              font-size: 4em;
+              font-size: 3em;
             }
           }
         `}

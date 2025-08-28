@@ -136,7 +136,7 @@ export default function PinterestRecommender() {
       <div className="container mx-auto px-4 max-w-4xl relative z-10">
         <ErrorMessage error={error} onDismiss={() => setError(null)} />
         <header className="mb-10 text-center">
-          <div className="flex flex-1 justify-center">
+          <div className=" flex flex-1 flex-col sm:flex-row md:flex-row lg:flex-row justify-center items-center">
             <Header />
             <Image
               src="/cutePin.png"

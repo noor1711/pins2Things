@@ -37,7 +37,7 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
         if (e.target === overlayRef.current) onClose?.();
       }}
     >
-      <Card className="w-full max-w-md bg-[#f5f1e2] border-2 border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
+      <Card className="w-full m-4 max-w-xs lg:max-w-lg md:max-w-md sm:max-w-sm bg-[#f5f1e2] border-2 border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
         <div className="p-5 consent-header text-black">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
@@ -83,20 +83,20 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
             </p>
           </div>
 
-          <div className="w-full flex flex-1 flex-row items-center justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="min-w-[96px] border-2 border-neutral-700 text-neutral-800"
-            >
-              Cancel
-            </Button>
+          <div className="w-full flex flex-1 flex-col md:flex-row lg:flex-row items-center justify-end gap-3">
             <Button
               onClick={onConsent}
               ref={allowRef}
-              className="min-w-[160px] border-2 border-black shadow-md text-[#519755] border-b-2 border-[#519755] bg-[#E8F5E9]"
+              className="border-2 w-full md:w-2/5 lg:w-2/5 border-black shadow-md text-[#519755] border-b-2 border-[#519755] bg-[#E8F5E9]"
             >
-              Allow and continue
+              Allow and Continue
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="border-2 w-full md:w-2/5 lg:w-2/5 border-neutral-700 text-neutral-800"
+            >
+              Cancel
             </Button>
           </div>
         </CardContent>
