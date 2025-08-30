@@ -87,7 +87,7 @@ const ConsentModal = ({ isOpen, onClose, onConsent, boardName }) => {
             <Button
               onClick={onConsent}
               ref={allowRef}
-              className="border-2 w-full md:w-2/5 lg:w-2/5 border-black shadow-md text-[#519755] border-b-2 border-[#519755] bg-[#E8F5E9]"
+              className="border-2 w-full md:w-2/5 lg:w-2/5 border-black shadow-md text-[#519755] border-b-2 border-[#519755] bg-[#E8F5E9] hover:bg-[#d0ebd0] font-semibold"
             >
               Allow and Continue
             </Button>

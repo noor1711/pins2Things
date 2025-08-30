@@ -86,79 +86,66 @@ def get_image_from_url(url):
 
 async def analyze_images_with_gemini(images):
     if not len(images):
-        return {"keywords": [], "search_query": ""}
-    prompt = """
-    You are a style consultant analyzing a collection of images for a client. Your goal is to synthesize a single, cohesive style profile. Analyze the aesthetic of this image. Identify key objects, color palette, and general mood.
-    Generate 3-5 concise, comma-separated keywords representing the core aesthetic and any prominent product types.
-    Also, provide a single, broad Google Search query (e.g., 'minimalist home decor products') that captures the overall style for finding related products.
-    Format your response strictly as JSON:
-    {
-        "keywords": ["keyword1", "keyword2", "keyword3"],
-        "search_query": "Your descriptive search query"
-    }
-    """
-    try:
-        logging.info("Requesting gemini content generation at", datetime.now())
-        await asyncio.sleep(random())
-        response = gemini_model.generate_content([prompt, *images], generation_config=types.GenerationConfig(
-        temperature=0.0,  # Set temperature to 0
-    ))
-        response_text = response.text.strip()
-        try:
-            result = json.loads(response_text)
-            return result
-        except json.JSONDecodeError:
-            logging.warning(f"Gemini response not perfect JSON, attempting fallback parsing: {response_text}")
-            keywords = []
-            search_query = ""
-            if "keywords" in response_text:
-                k_match = response_text.split('"keywords": [')[1].split(']')[0]
-                keywords = [kw.strip().strip('"') for kw in k_match.split(',') if kw.strip()]
-            if "search_query" in response_text:
-                s_match = response_text.split('"search_query": "')[1].split('"')[0]
-                search_query = s_match
-            return {"keywords": keywords, "search_query": search_query}
-    except Exception as e:
-        logging.error(f"Error analyzing image with Gemini: {e}")
-        return {"keywords": [], "search_query": ""}
+        return {"groups": []}
 
-async def analyze_image_with_gemini(image):
-    if not image:
-        return {"keywords": [], "search_query": ""}
     prompt = """
-    You are a style consultant analyzing a collection of images for a client. Your goal is to synthesize a single, cohesive style profile. Analyze the aesthetic of this image. Identify key objects, color palette, and general mood.
-    Generate 3-5 concise, comma-separated keywords representing the core aesthetic and any prominent product types.
-    Also, provide a single, broad Google Search query (e.g., 'minimalist home decor products') that captures the overall style for finding related products.
-    Format your response strictly as JSON:
+    You are a style consultant analyzing a collection of images for a client. Your goal is to synthesize a single, cohesive style profile.
+
+    Analyze the aesthetics of the following list of images.
+
+    1. If the images share a similar aesthetic, synthesize a single, cohesive style profile.
+        - Identify key objects, color palette, and general mood across all images.
+        - Generate 3-5 concise, comma-separated keywords representing the core aesthetic and any prominent product types.
+        - Provide a single, broad Google Search query that captures the overall style for finding related products.
+        - Provide a 4-6 word description of the overall aesthetic.
+
+    2. If the images represent distinct, clashing aesthetics, group them into separate, cohesive style profiles.
+        - For each group, identify key objects, color palette, and general mood.
+        - Generate 3-5 concise, comma-separated keywords for each group.
+        - Provide a single, broad Google Search query for each group.
+        - Provide a 4-6 word description of the overall aesthetic.
+
+    Your entire response must be a single JSON object. Do not include any other text, explanations, or formatting outside of the JSON structure.
+    
     {
-        "keywords": ["keyword1", "keyword2", "keyword3"],
-        "search_query": "Your descriptive search query"
+        "groups": [
+            {
+                "group_id": 1,
+                "description": "Your Descriptive aesthetic",
+                "keywords": ["keyword1", "keyword2", "keyword3"],
+                "search_query": "Your descriptive search query"
+            },
+            {
+                "group_id": 2,
+                "description": "Your Descriptive aesthetic",
+                "keywords": ["keyword1", "keyword2", "keyword3"],
+                "search_query": "Your descriptive search query"
+            }
+        ]
     }
+
+    - Note: If all images fit under one aesthetic, your response should contain only one object in the "groups" array.
     """
+    
     try:
-        await asyncio.sleep(random())
-        logging.info("Requesting gemini content generation at", datetime.now())
-        response = gemini_model.generate_content([prompt, image],  generation_config=types.GenerationConfig(
-        temperature=0.0,  # Set temperature to 0
-    ))
+        logging.info("Requesting Gemini content generation at %s", datetime.now())
+        # For demonstration purposes, removed `asyncio.sleep` to avoid delay
+        await asyncio.sleep(random()*0.5)
+        response = gemini_model.generate_content(
+            [prompt, *images],
+            generation_config={"temperature": 0.0, "response_mime_type": "application/json"},
+        )
+        
         response_text = response.text.strip()
-        try:
-            result = json.loads(response_text)
-            return result
-        except json.JSONDecodeError:
-            logging.warning(f"Gemini response not perfect JSON, attempting fallback parsing: {response_text}")
-            keywords = []
-            search_query = ""
-            if "keywords" in response_text:
-                k_match = response_text.split('"keywords": [')[1].split(']')[0]
-                keywords = [kw.strip().strip('"') for kw in k_match.split(',') if kw.strip()]
-            if "search_query" in response_text:
-                s_match = response_text.split('"search_query": "')[1].split('"')[0]
-                search_query = s_match
-            return {"keywords": keywords, "search_query": search_query}
+        
+        # The prompt and mime type should ensure correct JSON, no need for manual parsing
+        result = json.loads(response_text)
+        return result
+
     except Exception as e:
         logging.error(f"Error analyzing image with Gemini: {e}")
-        return {"keywords": [], "search_query": ""}
+        # Return the new group-based format on error
+        return {"groups": [{"group_id": 1, "description": "", "keywords": [], "search_query": ""}]}
 
 import re
 
@@ -177,7 +164,7 @@ def is_shopping_site_fast(result_item):
     blog_patterns = [
         r'/blog', r'/article', r'/post', r'/news', r'/review', r'/list', r'/guide',r'/how-to', r'/tips', r'/tutorial', r'/opinion', r'/op-ed',
     ]
-    print("Website link:", result_item.get("link"))
+    print("Website link:", result_item.get("link"), result_item.get("pagemap", {}).get("metatags", [{}])[0])
     for pattern in blog_patterns:
         if re.search(pattern, result_item.get("link"), re.IGNORECASE):
             return False
@@ -222,8 +209,6 @@ async def getRecommendations(pin_image_urls):
     if not pin_image_urls:
         return jsonify({"error": "Could not fetch images. Check board or API."}), 500
 
-    all_keywords = set()
-    overall_search_query_parts = []
     recommendations = []
 
     validImages = [get_image_from_url(img_url) for img_url in pin_image_urls if img_url]
@@ -237,25 +222,27 @@ async def getRecommendations(pin_image_urls):
      
     # results = await asyncio.gather(*tasks)
 
-    results = [await analyze_images_with_gemini(validImages)]
-
+    result = await analyze_images_with_gemini(validImages)
+    results = [*result["groups"]]
     for gemini_output in results:  
-            all_keywords.update(gemini_output["keywords"])
-            if gemini_output["search_query"]:
-                overall_search_query_parts.append(gemini_output["search_query"])
+        all_keywords = set()
+        overall_search_query_parts = []
+        all_keywords.update(gemini_output["keywords"])
+        if gemini_output["search_query"]:
+            overall_search_query_parts.append(gemini_output["search_query"])
 
-    final_keywords = list(all_keywords)
-    final_search_query = " ".join(sorted(list(set(overall_search_query_parts))))
-    if not final_search_query and final_keywords:
-         final_search_query = " ".join(final_keywords)
+        final_keywords = list(all_keywords)
+        final_search_query = " ".join(sorted(list(set(overall_search_query_parts))))
+        if not final_search_query and final_keywords:
+            final_search_query = " ".join(final_keywords)
 
-    if len(final_search_query):
-        final_search_query = final_search_query + " buy now -review -list -article -blog -site:reddit.com -site:pinterest.com"
+        if len(final_search_query):
+            final_search_query = final_search_query + " buy now -review -list -article -blog -site:reddit.com -site:pinterest.com -site:youtube.com"
 
-    print(f"Final Search Query: {final_search_query}")
-    if final_search_query:
-        cse_results = perform_google_cse_search(final_search_query)
-        recommendations.extend(cse_results)
+        print(f"Final Search Query: {final_search_query}")
+        if final_search_query:
+            cse_results = perform_google_cse_search(final_search_query)
+            recommendations.append({"search_query": ' '.join(all_keywords), "description": gemini_output["description"], "results": cse_results})
 
     response_data = {
         "processed_pins": pin_image_urls,
@@ -503,8 +490,8 @@ async def get_recommendations():
             return jsonify({"error": "Missing 'board_name' parameter"}), 400
 
         pin_urls = get_board_image_urls(board_name) if board_name else get_latest_image_urls(pin_size)
-        # get recommendations based on pin URLs
-        recommendations = await getRecommendations(pin_urls[:5])
+        # get recommendations based on pin URLs, move to config based limit
+        recommendations = await getRecommendations(pin_urls[:10])
         session['recommendations_generated'] = recommendationsGenerated + 1
         return jsonify(recommendations), 200
 

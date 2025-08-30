@@ -17,12 +17,19 @@ import { Header } from "@/components/Header";
 import Image from "next/image";
 
 const recommendationToCardItemMapper = (recommendations) => {
-  return recommendations?.recommendations?.map((item, index) => ({
-    id: index,
-    title: item.title,
-    image: item.thumbnail || "/placeholder.svg?height=200&width=200",
-    link: item.link || "#",
-  }));
+  return recommendations?.recommendations?.map((element) => {
+    const description = element?.description || "Pinteresty Products";
+    const cards = element?.results?.map((item, index) => ({
+      id: index,
+      title: item.title,
+      image: item.thumbnail || "/placeholder.svg?height=200&width=200",
+      link: item.link || "#",
+    }));
+    return {
+      description,
+      cards,
+    };
+  });
 };
 
 export default function PinterestRecommender() {
@@ -296,7 +303,7 @@ export default function PinterestRecommender() {
           {isLoading ? (
             <SkeletonGrid message="Discovering products that match your aesthetic…" />
           ) : recommendations ? (
-            <RecommendationGrid items={recommendations} />
+            <RecommendationGrid itemGroups={recommendations} />
           ) : null}
         </section>
 
