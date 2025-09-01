@@ -50,12 +50,17 @@ export const AuthProvider = ({ children }) => {
       });
   }, []);
 
+  const resetAuthentication = () => {
+    setIsAuthenticated(false);
+  };
+
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
         isLoadingAuth,
         authenticateUser,
+        resetAuthentication,
       }}
     >
       {children}

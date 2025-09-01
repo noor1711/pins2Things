@@ -9,6 +9,7 @@ export const getRecommendations = async ({
   boardName,
   pinCount,
   activeTab,
+  resetAuthentication,
 }) => {
   // This function fetches recommendations from the backend API
   try {
@@ -29,6 +30,9 @@ export const getRecommendations = async ({
     return data;
   } catch (err) {
     console.error("Error fetching recommendations:", err);
+    if (err?.message == "User not authenticated with Pinterest") {
+      resetAuthentication();
+    }
     throw err;
   }
 };

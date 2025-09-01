@@ -467,9 +467,6 @@ def get_latest_image_urls(page_size):
 async def get_recommendations():
     access_token = get_valid_pinterest_token()
     if not access_token:
-        return redirect("pinterest-auth-start") # Redirect to start OAuth flow if no valid token
-    
-    if not access_token:   
         return jsonify({"error": "User not authenticated with Pinterest"}), 401
 
     recommendationsGenerated = session.get('recommendations_generated', 0)

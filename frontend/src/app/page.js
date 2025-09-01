@@ -39,7 +39,7 @@ export default function PinterestRecommender() {
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
   const [error, setError] = useState(null);
-  const { isAuthenticated, authenticateUser } = useAuth();
+  const { isAuthenticated, authenticateUser, resetAuthentication } = useAuth();
   const [showConsentModal, setShowConsentModal] = useState(false);
   const searchParams = useSearchParams();
 
@@ -57,6 +57,7 @@ export default function PinterestRecommender() {
         boardName,
         pinCount,
         activeTab,
+        resetAuthentication,
       });
       setRecommendations(recommendationToCardItemMapper(recommendations));
       console.log("Fetched recommendations:", recommendations);
@@ -210,8 +211,6 @@ export default function PinterestRecommender() {
                         value={boardName}
                         onChange={(e) => setBoardName(e.target.value)}
                         className="pl-9 h-10 text-neutral-900 placeholder-neutral-500 border-neutral-800 focus:border-green-800 focus-visible:ring-green-800/30 focus-visible:ring-4"
-                        aria-invalid={!!error}
-                        aria-describedby={error ? "board-error" : undefined}
                         disabled={isLoading}
                       />
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -276,17 +275,11 @@ export default function PinterestRecommender() {
               </Button>
 
               <div className="mt-4 min-h-[1.25rem]">
-                {error ? (
-                  <p id="board-error" className="text-sm text-red-600">
-                    {error}
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-500">
-                    {activeTab === "board"
-                      ? "We'll ask permission before accessing your board."
-                      : "We'll ask permission before accessing your recent pins."}
-                  </p>
-                )}
+                <p className="text-xs text-gray-500">
+                  {activeTab === "board"
+                    ? "We'll ask permission before accessing your board."
+                    : "We'll ask permission before accessing your recent pins."}
+                </p>
               </div>
               <div className="sr-only" aria-live="polite">
                 {isLoading

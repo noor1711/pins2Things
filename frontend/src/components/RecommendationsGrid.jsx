@@ -58,11 +58,7 @@ const RecommendationGrid = ({ itemGroups }) => {
                       <h3 className="text-base font-semibold text-neutral-800 line-clamp-2">
                         {item?.title}
                       </h3>
-                      <Link
-                        target="_blank"
-                        href={item?.link || "#"}
-                        className="block"
-                      >
+                      <Link target="_blank" href={item?.link || "#"}>
                         <Button className="w-full text-neutral-100 border-2 border-black bg-emerald-700 hover:bg-emerald-600">
                           View
                         </Button>
