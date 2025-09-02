@@ -42,6 +42,37 @@ export default function PinterestRecommender() {
   const { isAuthenticated, authenticateUser, resetAuthentication } = useAuth();
   const [showConsentModal, setShowConsentModal] = useState(false);
   const searchParams = useSearchParams();
+  const [country_code, setCountryCode] = useState(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            // Use a reverse geocoding API to get the country code
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}&addressdetails=1`
+            );
+            const data = await response.json();
+
+            if (data.address && data.address.country_code) {
+              setCountryCode(data.address.country_code);
+            }
+          } catch (err) {
+            setError("Failed to fetch location data.");
+            console.error(err);
+          }
+        },
+        (err) => {
+          if (err.message === "User denied Geolocation") {
+            setError(
+              "Geolocation permission denied, please enable location services for better suggestions."
+            );
+          }
+        }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     const board = searchParams.get("board");
@@ -58,6 +89,7 @@ export default function PinterestRecommender() {
         pinCount,
         activeTab,
         resetAuthentication,
+        country_code,
       });
       setRecommendations(recommendationToCardItemMapper(recommendations));
       console.log("Fetched recommendations:", recommendations);

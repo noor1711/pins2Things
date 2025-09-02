@@ -178,10 +178,13 @@ def perform_google_cse_search(query):
     if not query:
         return []
     search_url = f"https://www.googleapis.com/customsearch/v1"
+    countryCode = session.get('countryCode', 'in').lower()
+    retrictTo = "country" + countryCode.upper()
     params = {
         "key": GOOGLE_CSE_API_KEY,
         "cx": GOOGLE_CSE_ID,
-        "gl": "IN",
+        "gl": countryCode,
+        "cr": retrictTo,
         "q": query,
         "num": 10,
     }
@@ -468,7 +471,7 @@ async def get_recommendations():
     access_token = get_valid_pinterest_token()
     if not access_token:
         return jsonify({"error": "User not authenticated with Pinterest"}), 401
-
+    session['countryCode'] = request.args.get('countryCode') or session.get('countryCode', 'in')
     recommendationsGenerated = session.get('recommendations_generated', 0)
 
     logging.info("Recommendations Generated:", recommendationsGenerated)

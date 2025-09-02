@@ -10,13 +10,18 @@ export const getRecommendations = async ({
   pinCount,
   activeTab,
   resetAuthentication,
+  country_code,
 }) => {
   // This function fetches recommendations from the backend API
   try {
     const params =
       activeTab === "board"
-        ? `board=${encodeURIComponent(boardName)}`
-        : `pin_size=${encodeURIComponent(pinCount)}`;
+        ? `board=${encodeURIComponent(
+            boardName
+          )}&countryCode=${encodeURIComponent(country_code)}`
+        : `pin_size=${encodeURIComponent(
+            pinCount
+          )}&countryCode=${encodeURIComponent(country_code)}`;
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_RECOMMENDATIONS_URL}?${params}`,
