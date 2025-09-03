@@ -240,7 +240,7 @@ async def getRecommendations(pin_image_urls):
             final_search_query = " ".join(final_keywords)
 
         if len(final_search_query):
-            final_search_query = final_search_query + " buy now -review -list -article -blog -site:reddit.com -site:pinterest.com -site:youtube.com"
+            final_search_query = final_search_query + " buy now -review -list -article -blog -site:reddit.com -site:pinterest.com -site:youtube.com -site:tripadvisor.com"
 
         print(f"Final Search Query: {final_search_query}")
         if final_search_query:
