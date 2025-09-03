@@ -188,7 +188,7 @@ export default function PinterestRecommender() {
             />
           </div>
 
-          <p className="text-neutral-900 mt-3">
+          <p className="font-raleway font-semibold text-neutral-900 mt-3">
             Find products that match your vibe.
           </p>
         </header>

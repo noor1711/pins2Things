@@ -19,7 +19,10 @@ export const Header = () => {
               #a2d5ab,
               #00a36c
             );
+            margin-bottom: -0.5em;
+            margin-top: -0.5em;
           }
+
           @media (max-width: 768px) {
             .text-with-image-background {
               font-size: 3em;
